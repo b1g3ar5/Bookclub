@@ -31,17 +31,6 @@ import Hakyll
 import Csvstuff
 
 import System.IO
---import Control.Applicative
-
-{--
-Test code:
-
-let ss = readFile "./csv/scoreTable.csv
-let vv=fmap (parse csvFile "na") ss
-
-
---}
-
 
 main :: IO ()
 main = hakyll $ do
@@ -66,15 +55,7 @@ main = hakyll $ do
 				>>> addDefaultFields
 				>>> applyTemplateCompiler "templates/chart.html"
 	
-	-- This compiles all the csv files in the xml directory into xml
-	-- for the charts (included with js)
---	match "xml/*" $ do
---		route $ setExtension ".xml"
---		compile $ scoreChartCompiler
---			>>> addDefaultFields
---			>>> applyTemplateCompiler "templates/chart.html"
-					
-					
+				
 	-- Copy the sytle guides
 	match "css/*" $ do
 		route   idRoute
@@ -138,7 +119,7 @@ csv2tdb s = fmap fromDb (csv2db s)
 csv2html::String->Page String
 csv2html input = case parse csvFile "page" input of
 						Left err -> error (show err)
-						Right (b) -> Page (M.fromList []) (write_db $ fromCsv b) 
+						Right (b) -> Page (M.fromList []) (show $ fromCsv b) 
 						
 						
 -------------------------------------------------------------------------		
@@ -176,15 +157,15 @@ write_meanness_chart tdb = do
 
 -- The x has a no name and then numbers
 write_chart_legend::Tdb->String
-write_chart_legend ys = "<row><null/>\n" ++ foldl (\a y-> a ++ "<string>" ++ fst y ++ "</string>\n") "" ys ++ "</row>\n"
+write_chart_legend ys = "<row><null/>\n" ++ concatMap (\y-> "<string>" ++ fst y ++ "</string>\n") ys ++ "</row>\n"
 
 -- The x has a no name and then numbers
 write_chart_xs::Col->String
-write_chart_xs xs = "<row><null/>\n" ++ foldl (\a w-> a ++ "<string>" ++ w ++ "</string>\n") "" (lshow (snd xs)) ++ "</row>\n"
+write_chart_xs xs = "<row><null/>\n" ++ show (snd xs) ++ "</row>\n"
 
 -- The y has a name (string) and then numbers
 write_chart_y::Col->String
-write_chart_y ys = "<row><string>" ++ fst ys ++ "</string>\n" ++ foldl (\a y -> a ++ "<number>" ++ y ++ "</number>\n") "" (lshow (snd ys)) ++ "</row>\n"
+write_chart_y ys = "<row><string>" ++ fst ys ++ "</string>\n" ++ show (snd ys) ++ "</row>\n"
 
 -- writes a y for max, min, open=mean-std, close=mean+std
 write_chart_stat::String->[Double]->String

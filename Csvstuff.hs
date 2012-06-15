@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, Arrows #-}
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances, OverlappingInstances, OverloadedStrings, Arrows #-}
 
 module Csvstuff
     (
@@ -22,7 +22,7 @@ module Csvstuff
 		exec,
 		readQuery,
 		csvFile,
-		mread,
+		dread,
 		msum,
 		msumsq,
 		mcount,
@@ -32,16 +32,13 @@ module Csvstuff
 		mstd,
 		rownames,
 		colnames,
-		write_db,
 		Col,
-		toString,
 		line,
 		p_value,
 		p_string,
 		p_number,
 		p_empty,
-		isdouble,
-		lshow
+		isdouble
     ) where
 	
 import Control.Applicative
@@ -62,17 +59,14 @@ import System.FilePath (dropExtension, takeFileName)
 
 -- We have 2 types, string or numbers = Maybe Double
 -- So, strings are NOT NULL, NULL = Nothing in the Maybe Double
-data Value = S String | N (Maybe Double) deriving (Eq, Ord, Show)
-data LValue = LS [String] | LN [Maybe Double] deriving (Eq, Ord, Show)
+data Value = S String | N (Maybe Double) deriving (Eq, Ord)
+data LValue = LS [String] | LN [Maybe Double] deriving (Eq, Ord)
 
-lshow::LValue->[String]
-lshow lv = case lv of
-				LN ln -> map mshow ln
-				LS ls -> ls
-			where 
-				mshow (Just n) = show n
-				mshow Nothing = ""
-			
+-- Overide the standard show
+instance Show (Maybe Double) where
+	show (Just v) = show v
+	show Nothing = ""
+	
 instance Monoid LValue where
 	mappend l1 l2 = case (l1, l2) of
 					(LN ln1, LN ln2) -> LN (ln1++ln2)
@@ -81,12 +75,19 @@ instance Monoid LValue where
 					(LS ls1, LS ls2) -> LS (ls1++ls2)
 	mempty = LN []
 
+-- Shows the LValue in a column - for the xml file for charts package
+-- Shows the strings for when it's eg the names of the books
+-- Shows the numbers for when it's eg the scores
+instance Show LValue where
+	show (LN ln) = concatMap (\md-> "<number>" ++ show md ++ "</number>" ) ln
+	show (LS ls) = concatMap (\ms-> "<string>" ++ ms ++ "</string>" ) ls	
 
-toString::Value->String
-toString (S s) = s
-toString (N (Just v)) = show v
-toString (N Nothing) = ""
+instance Show Value where
+	show (S s) = s
+	show (N (Just v)) = show v
+	show (N Nothing) = ""
 
+	
 type Csv = [[Value]]
 type Db = [Record]
 type Record = [Field]
@@ -94,7 +95,15 @@ type Field = (String, Value)	-- key, value
 type Col = (String, LValue)   	-- ie. all the same field - we need to make them all doubles or all strings...
 type Tdb = [Col]
 
+-- Writes a Db as a html table
+instance Show Db where 
+	show db = "<table>" ++ (write_header (head db)) ++ (concatMap show (tail db)) ++ "</table>"
 
+-- Writes a Record as a html table-record
+-- where each field is a <td>
+instance Show Record where
+	show r = "<tr>" ++ concatMap (\f -> "<td>" ++ show (snd f) ++ "</td>") r ++ "</tr>"
+		
 -- Add a field to a column
 -- If one of the fields is a string then we get a sring
 addField::Field->Col->Col
@@ -142,29 +151,6 @@ isdouble c = case (snd c) of
 				LN n -> True
 				LS s -> False
 				
-{-
-csv :: Csv
-csv =
-  [ [S "Name" , S "City"      ]
-     -------  ------------                                                      
-  , [ S "Will" , S "London"    ]
-  , [ S "John" , S "London"    ]
-  , [ S "Chris", S "Manchester"]
-  , [ S "Colin", S "Liverpool" ]
-  , [ S "Nick" , S "London"    ]
-  ]
-  
-db=fromCsv csv
-tdb=fromDb db
-  
--- "Name"="*i*" @2="London"                                                     
-query :: Query
-query =
-  [ (FieldName "Name", [Wildcard, Char 'i', Wildcard])
-  , (FieldIndex 2,
-      [Char 'L', Char 'o', Char 'n', Char 'd', Char 'o', Char 'n'])
-  ]  
--}
 
 -- The headers are the first row, turned into strings, if not already
 fromCsv::Csv->Db
@@ -182,7 +168,6 @@ data Selector = FieldName String | FieldIndex Int
 type ValueFilter = [CParser]
 data CParser = Char Char | Wildcard
 
-	
 cparse :: CParser -> String -> [String]
 cparse (Char c) (c' : cs') | c == c' = [cs']
 cparse Wildcard []                   = [[]]
@@ -257,22 +242,10 @@ p_string = many (noneOf ",\n\r")
 
 			  
 -------------------------------------------------------------------------
--- Writes a matrix of strings to one long xml string = html for a table
+-- Writes a header from the strings of each field
 -------------------------------------------------------------------------
-write_db::Db -> String
-write_db db = "<table>" ++ (write_header (head db)) ++ (concatMap write_row (tail db)) ++ "</table>"
-
 write_header::Record->String
-write_header r = "<tr>" ++ foldl (\a f ->a ++ "<th>" ++ fst f ++ "</th>") "" (r) ++ "</tr>"
-	
-write_row::Record->String
-write_row r = "<tr>" ++ foldl (\a f ->
-									case snd f of
-										S s -> a ++ "<td>" ++ s ++ "</td>"
-										N (Just v) -> a ++ "<td>" ++ show v ++ "</td>"
-										N Nothing -> a ++ "<td></td>"
-								) "" r ++ "</tr>"
-		
+write_header r = "<tr>" ++ concatMap (\f ->"<th>" ++ fst f ++ "</th>") (r) ++ "</tr>"
 	
 {-------------------------------------------
 Operations on a Db
@@ -284,7 +257,7 @@ colnames = map fst . head
 
 -- Takes the first column as the row names
 rownames::Db->[String]
-rownames = map (toString . snd . head) . tail
+rownames = map (show . snd . head) . tail
 
 -- The data rows - ie tail!
 rows::Db->Db
@@ -298,14 +271,14 @@ columns db = tail $ foldl add_on (map (\x->[x]) (head $ tail db)) (tail $ tail d
 		
 				
 -- Convert a column to numbers	
-cread::[String]->[Maybe Double]
-cread = map mread
+dlread::[String]->[Maybe Double]
+dlread = map dread
 	
 -- Some functions to play with columns
 	
 -- Reads a strings to Maybe Double
-mread::String->Maybe Double
-mread s = case readFloat s of
+dread::String->Maybe Double
+dread s = case readFloat s of
 			[(n,s')]-> Just n
 			_ -> Nothing
 	
