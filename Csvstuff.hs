@@ -292,6 +292,31 @@ msum xs = foldl (\a x -> case x of
 						LN ln -> ln
 						LS ls -> []
 	
+-- folds a function over a LValue only if it is a Maybe Double list
+mapply::(Double->Double->Double)->LValue->Double
+mapply f xs = 	foldl (\a x -> case x of
+						Just n -> f a n
+						Nothing -> a
+				    ) 0.0 ld
+				where ld = case xs of
+					LN ln -> ln
+					LS ls -> [] 
+mmax = mapply max
+mmin = mapply min
+msumsq = mapply (\a n -> a+n*n)
+mcount = mapply (\a n -> a+1.0)
+	
+mmean::LValue->Double	
+mmean xs = (msum xs)/(mcount xs)
+	
+mvar::LValue->Double	
+mvar xs = (msumsq xs)/(mcount xs) - (mmean xs)**2.0
+		
+mstd::LValue->Double	
+mstd xs = (mvar xs)**0.5
+		
+
+{-
 mmax::LValue->Double	
 mmax xs = foldl (\a x -> case x of
 						Just n -> max a n
@@ -327,13 +352,5 @@ mcount xs = foldl (\a x -> case x of
 			where ld = case xs of
 						LN ln -> ln
 						LS ls -> [] 
+-}
 	
-mmean::LValue->Double	
-mmean xs = (msum xs)/(mcount xs)
-	
-mvar::LValue->Double	
-mvar xs = (msumsq xs)/(mcount xs) - (mmean xs)**2.0
-		
-mstd::LValue->Double	
-mstd xs = (mvar xs)**0.5
-		
