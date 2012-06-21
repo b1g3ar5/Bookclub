@@ -28,7 +28,9 @@ import Numeric (readSigned, readFloat)
 import System.FilePath (dropExtension, takeFileName) 
 
 import Hakyll
+import CsvParser
 import Csvstuff
+import CsvDatabase
 
 import System.IO
 
@@ -93,24 +95,10 @@ includeFile csv_file page =
 bespokeCompiler::(String->Page String)->Compiler Resource (Page String)
 bespokeCompiler = (getResourceString >>^)
 
-scoreTableCompiler = bespokeCompiler csv2html
-scoreChartCompiler = bespokeCompiler csv2score_chart	
-meannessChartCompiler = bespokeCompiler csv2meanness_chart	
+scoreTableCompiler = bespokeCompiler (csv2ml show)
+scoreChartCompiler = bespokeCompiler (csv2ml (write_chart . fromDb))	
+meannessChartCompiler = bespokeCompiler (csv2ml (write_meanness_chart . fromDb))	
 
-{-
-
--- My compiler for the scores csv file
-scoreTableCompiler::Compiler Resource (Page String)
-scoreTableCompiler = getResourceString >>^ csv2html 
-
--- My compiler for the scoreChart.xml file
-scoreChartCompiler::Compiler Resource (Page String)
-scoreChartCompiler = getResourceString >>^ csv2score_chart 
-
--- My compiler for the meannessChart.xml file
-meannessChartCompiler::Compiler Resource (Page String)
-meannessChartCompiler = getResourceString >>^ csv2meanness_chart 
--}
 -------------------------------------------------------------------------		
 -- My ripoff of the readPage for csv pages
 -- It parses the page and then translates to a html table
@@ -122,9 +110,7 @@ csv2db input = case parse csvFile "page" input of
 
 csv2tdb::String->Page Tdb
 csv2tdb s = fmap fromDb (csv2db s)
-
-						
-						
+											
 -------------------------------------------------------------------------		
 -- Parses the page and then translates to a the xml for a score chart
 -------------------------------------------------------------------------
@@ -132,28 +118,7 @@ csv2ml::(Db->String)->String->Page String
 csv2ml f input = case parse csvFile "page" input of
 						Left err -> error (show err)
 						Right (b) -> Page (M.fromList []) (f $ fromCsv b) 
-
-
-csv2html = csv2ml show						
-csv2score_chart = csv2ml (write_chart . fromDb)
-csv2meanness_chart = csv2ml (write_meanness_chart . fromDb)
-						
-{-					
-csv2html::String->Page String
-csv2html input = case parse csvFile "page" input of
-						Left err -> error (show err)
-						Right (b) -> Page (M.fromList []) (show $ fromCsv b) 
-csv2score_chart::String->Page String
-csv2score_chart input = case parse csvFile "page" input of
-							Left err -> error (show err)
-							Right (b) -> Page (M.fromList []) (write_chart $ fromDb $ fromCsv b) 
-
-csv2meanness_chart::String->Page String
-csv2meanness_chart input = case parse csvFile "page" input of
-							Left err -> error (show err)
-							Right (b) -> Page (M.fromList []) (write_meanness_chart $ fromDb $ fromCsv b) 
--}
-
+												
 
 ------------------------------------------------------------
 -- Writes a matrix of strings an xml string for a chart
