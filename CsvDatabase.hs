@@ -6,10 +6,9 @@ module CsvDatabase
 		Db,
 		LValue (LN, LS),
 		exec,
-		readQuery,
 		Col,
 		isdouble,
-		mapply,
+		mfoldl,
 		fromDb,
 		fromTdb,
 		fromCsv,
@@ -171,12 +170,9 @@ apply (s, vf) r = case select s r of
 exec :: Query -> Db -> [Record]
 exec = (flip . foldl . flip) (filter . apply)
 
-readQuery :: String -> Maybe Query
-readQuery = undefined  	
-
 -- folds a function over a LValue only if it is a Maybe Double list
-mapply::(Double->Double->Double)->LValue->Double
-mapply f xs = 	foldl (\a x -> case x of
+mfoldl::(Double->Double->Double)->LValue->Double
+mfoldl f xs = 	foldl (\a x -> case x of
 						Just n -> f a n
 						Nothing -> a
 				    ) 0.0 ld
@@ -184,3 +180,30 @@ mapply f xs = 	foldl (\a x -> case x of
 					LN ln -> ln
 					LS ls -> [] 
 
+					
+{-			
+csv :: Csv
+csv =
+  [ ["Name" , "City"      ]
+     -------  ------------                                                      
+  , ["Will" , "London"    ]
+  , ["John" , "London"    ]
+  , ["Chris", "Manchester"]
+  , ["Colin", "Liverpool" ]
+  , ["Nick" , "London"    ]
+  ]
+Then, we construct a simple query:
+
+-- "Name"="*i*" @2="London"                                                     
+query :: Query
+query =
+  [ (FieldName "Name", [Wildcard, Char 'i', Wildcard])
+  , (FieldIndex 2,
+      [Char 'L', Char 'o', Char 'n', Char 'd', Char 'o', Char 'n'])
+  ]
+And, indeed, running our query against the database yields:
+
+> exec query (fromCsv csv)
+[[("Name","Will"),("City","London")],[("Name","Nick"),("City","London")]]					
+					
+-}

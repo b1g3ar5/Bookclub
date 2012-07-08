@@ -68,12 +68,12 @@ dread s = case readFloat s of
 			[(n,s')]-> Just n
 			_ -> Nothing
 	
-
-msum = mapply (+)					
-mmax = mapply max
-mmin = mapply min
-msumsq = mapply (\a n -> a+n*n)
-mcount = mapply (\a n -> a+1.0)
+-- Statisitcs
+msum = mfoldl (+)					
+mmax = mfoldl max
+mmin = mfoldl min
+msumsq = mfoldl (\a n -> a+n*n)
+mcount = mfoldl (\a n -> a+1.0)
 	
 mmean::LValue->Double	
 mmean xs = (msum xs)/(mcount xs)

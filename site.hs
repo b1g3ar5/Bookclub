@@ -57,6 +57,13 @@ main = hakyll $ do
 				>>> addDefaultFields
 				>>> applyTemplateCompiler "templates/chart.html"
 	
+	group("pickerChart") $ do
+		match "csv/scoreTable.csv" $ do
+			route $ customRoute (\_->"xml/pickerChart.xml")
+			compile $ pickerChartCompiler
+				>>> addDefaultFields
+				>>> applyTemplateCompiler "templates/chart.html"
+	
 				
 	-- Copy the sytle guides
 	match "css/*" $ do
@@ -98,6 +105,7 @@ bespokeCompiler = (getResourceString >>^)
 scoreTableCompiler = bespokeCompiler (csv2ml show)
 scoreChartCompiler = bespokeCompiler (csv2ml (write_chart . fromDb))	
 meannessChartCompiler = bespokeCompiler (csv2ml (write_meanness_chart . fromDb))	
+pickerChartCompiler = bespokeCompiler (csv2ml (write_picker_chart . fromDb))	
 
 -------------------------------------------------------------------------		
 -- My ripoff of the readPage for csv pages
@@ -129,6 +137,18 @@ write_chart tdb =
 
 write_meanness_chart::Tdb-> String
 write_meanness_chart tdb = do
+	let ncols = filter isdouble tdb
+	let nys =  map (\c-> snd c) ncols
+	let maxs = map  (\c-> mmax c) nys
+	let mins = map  (\c-> mmin c) nys
+	let means = map (\c->mmean c) nys
+	let stds = map (\c-> mstd c) nys
+	let opens = zipWith (+) means stds
+	let closes = zipWith (-) means stds
+	"<chart_data>" ++ (write_chart_legend ncols) ++ (write_chart_stat "max" maxs) ++ (write_chart_stat "min" mins) ++ (write_chart_stat "open" opens) ++ (write_chart_stat "close" closes) ++ "</chart_data><chart_type>candlestick</chart_type><series_color><color>333333</color></series_color>\n"
+
+write_picker_chart::Tdb-> String
+write_picker_chart tdb = do
 	let ncols = filter isdouble tdb
 	let nys =  map (\c-> snd c) ncols
 	let maxs = map  (\c-> mmax c) nys
