@@ -1,26 +1,27 @@
 {-# LANGUAGE OverloadedStrings, Arrows #-}
 
-{-
+ {-
 module Site (
 	main
-	,csv2html
+	,csv2ml
 	,includeFile
 	,scoreTableCompiler
 	,scoreChartCompiler
 	,csv2db
-	,csv2score_chart
+	,simple_csv2db
 	,write_chart
 	,write_chart_xs
 	,write_chart_y,
 	getField
 ) where
--}
+ -}
 
 import Control.Arrow ((>>>))
 import Prelude hiding (id)
 import Control.Category (id)
 import Control.Monad (forM_, liftM)
 import Control.Arrow (arr, (>>^), (&&&), (>>>), (***), second)
+import Data.List hiding (group)
 import Data.Monoid (mempty, mconcat)
 import qualified Data.Map as M
 import Text.ParserCombinators.Parsec
@@ -28,21 +29,33 @@ import Numeric (readSigned, readFloat)
 import System.FilePath (dropExtension, takeFileName) 
 
 import Hakyll
-import CsvParser
-import Csvstuff
-import CsvDatabase
+import CsvParser as CP
+import Csvstuff as CS
+import CsvDatabase as CD
 
 import System.IO
 
 main :: IO ()
 main = hakyll $ do
 
--- Create the xml for all the charts from the csv file
--- This is included in the file this side so no route required
-	csvs <- match "csv/*.csv" $ do
+-- This creates an include file for the scoreTable page
+	scoreTable <- match "csv/scoreTable.csv" $ do
 		compile $ scoreTableCompiler
 			>>> addDefaultFields
 
+	strings <- group("strings") $ do
+		match "csv/scoreTable.csv" $ do
+		compile $ nameCompiler "STRINGS"
+			>>> addDefaultFields
+
+	stretch <- group("stretch") $ do
+		match "csv/scoreTable.csv" $ do
+		compile $ nameCompiler "STRETCH"
+			>>> addDefaultFields
+
+-- How do I create an include file for the hitParade page?
+			
+-- This creates the xml file for the graph in the scoreChart page
 	group("scoreChart") $ do
 		match "csv/scoreTable.csv" $ do
 			route $ gsubRoute "csv/scoreTable.csv" (const "xml/scoreChart.xml")
@@ -50,6 +63,7 @@ main = hakyll $ do
 				>>> addDefaultFields
 				>>> applyTemplateCompiler "templates/chart.html"
 	
+-- This creates the xml file for the graph in the meannessChart page
 	group("meannessChart") $ do
 		match "csv/scoreTable.csv" $ do
 			route $ customRoute (\_->"xml/meannessChart.xml")
@@ -57,6 +71,7 @@ main = hakyll $ do
 				>>> addDefaultFields
 				>>> applyTemplateCompiler "templates/chart.html"
 	
+-- This creates the xml file for the graph in the pickerChart page
 	group("pickerChart") $ do
 		match "csv/scoreTable.csv" $ do
 			route $ customRoute (\_->"xml/pickerChart.xml")
@@ -80,10 +95,14 @@ main = hakyll $ do
 
     -- Copy all the pages
 	-- Note readPageCompiler so Pandoc not called
+	-- Also the csvs are all included (but there is only one becasue there is one file
+	-- in the csv directory above
 	match "pages/*" $ do
 		route   $ setExtension ".html"
 		compile $ readPageCompiler
-			>>> requireAll csvs (foldr includeFile) 
+			>>> requireAll scoreTable (foldr includeFile) 
+			>>> requireAll strings (foldr (namedIncludeFile "strings") )
+			>>> requireAll stretch (foldr (namedIncludeFile "stretch") ) 
 			>>> addDefaultFields 
 			>>> arr applySelf 
 			>>> applyTemplateCompiler "templates/default.html"
@@ -98,11 +117,15 @@ includeFile csv_file page =
 			let key=dropExtension $ takeFileName $ getField "path" csv_file
 			in setField key (pageBody csv_file) page
 		
+namedIncludeFile::String->Page String->Page a->Page a
+namedIncludeFile name csv_file page = setField name (pageBody csv_file) page
+
 		
 bespokeCompiler::(String->Page String)->Compiler Resource (Page String)
 bespokeCompiler = (getResourceString >>^)
 
 scoreTableCompiler = bespokeCompiler (csv2ml show)
+nameCompiler n = bespokeCompiler (csv2ml (show.(sortdb (FieldName n))))
 scoreChartCompiler = bespokeCompiler (csv2ml (write_chart . fromDb))	
 meannessChartCompiler = bespokeCompiler (csv2ml (write_meanness_chart . fromDb))	
 pickerChartCompiler = bespokeCompiler (csv2ml (write_picker_chart . fromDb))	
@@ -116,6 +139,11 @@ csv2db input = case parse csvFile "page" input of
 						Left err -> error (show err)
 						Right (b) -> Page (M.fromList []) (fromCsv b) 
 
+simple_csv2db::String->Db
+simple_csv2db input = case parse csvFile "page" input of
+						Left err -> error (show err)
+						Right (b) -> fromCsv b
+
 csv2tdb::String->Page Tdb
 csv2tdb s = fmap fromDb (csv2db s)
 											
@@ -125,9 +153,8 @@ csv2tdb s = fmap fromDb (csv2db s)
 csv2ml::(Db->String)->String->Page String
 csv2ml f input = case parse csvFile "page" input of
 						Left err -> error (show err)
-						Right (b) -> Page (M.fromList []) (f $ fromCsv b) 
+						Right (b) -> Page (M.fromList []) (f $ fromCsv b) 												
 												
-
 ------------------------------------------------------------
 -- Writes a matrix of strings an xml string for a chart
 ------------------------------------------------------------
@@ -178,6 +205,24 @@ write_chart_stat name ys = do
 
 
 			
+{-			
 
+:l site CsvStuff CsvParser CsvDatabase
+let ss = readFile "./csv/hitParade.csv"
+let dd = liftM simple_csv2db ss
+let sdd = liftM (sortdb (FieldName "STRINGS")) dd
+let ndd = liftM (sortdb (FieldName "STRETCH")) dd
+
+	
+
+
+
+
+
+
+
+
+	
+-}
 
 	

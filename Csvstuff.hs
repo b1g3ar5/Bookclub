@@ -69,11 +69,11 @@ dread s = case readFloat s of
 			_ -> Nothing
 	
 -- Statisitcs
-msum = mfoldl (+)					
-mmax = mfoldl max
-mmin = mfoldl min
-msumsq = mfoldl (\a n -> a+n*n)
-mcount = mfoldl (\a n -> a+1.0)
+msum = mfoldl (+) 0.0					
+mmax = mfoldl max 0.0
+mmin = mfoldl min 10.0
+msumsq = mfoldl (\a n -> a+n*n) 0.0
+mcount = mfoldl (\a n -> a+1.0) 0.0
 	
 mmean::LValue->Double	
 mmean xs = (msum xs)/(mcount xs)

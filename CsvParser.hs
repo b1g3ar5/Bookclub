@@ -7,7 +7,8 @@ module CsvParser
 		p_value,
 		p_string,
 		p_number,
-		p_empty
+		p_empty,
+		parse
     ) where
 
 import Control.Applicative

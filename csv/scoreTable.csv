@@ -5,10 +5,10 @@ A Prayer for Owen Meany,John Irving,8,8,9,9,9,STRETCH
 Devil May Care,Sebastian Faulks,5,3,2,n/a,n/a,STRINGS
 The Plague,Albert Camus,3,6,3,n/a,n/a,NEIL
 London Fields,Martin Amis,7,6,10,n/a,n/a,STRETCH
-Winter in Madrid,CJ Sansom,7,9,5,8,7,JETHRO
-Disgrace,JM Cotzee,6,7,6,6,n/a,IAIN
+Winter in Madrid,CJ Sansom,7,9,5,8,7,STRINGS
+Disgrace,JM Cotzee,6,7,6,6,n/a,NEIL
 Surely You're Joking Mr Feynman,Richard Feynman,5,6,5,n/a,7,STRETCH
-Fox Hunting Man,Siegfried Sassoon,7,4,3,7,n/a,JETHRO
+Fox Hunting Man,Siegfried Sassoon,7,4,3,7,n/a,STRINGS
 To Kill a Mocking Bird,Haroer Lee,8,9,8,9,8,NEIL
 Coming Up for Air,George Orwell,8,7,6,7,6,IAIN
 Most Wanted Man,John LeCarre,5,6,6,5,4,STRETCH
@@ -21,23 +21,23 @@ One Flew Over the Cukoos Nest,Robert Faggen,4,5,4,4,3,JETHRO
 Point of Rescue,Sophie Hannah,5,4,3.5,4,7,STRINGS
 The Girl with the Dragon Tattoo,Steig Larsson,8,10,5.5,8,8,NEIL
 Bleak House,Charles Dickens,3,7,7.1,7.5,2,STRETCH
-Ordinary Thunderstorms,William Boyd,8,4,3,7,3,JETHRO
-A Farewell To Arms,Ernest Hemmingway,5,4,5.5,7.5,7,IAIN
+Ordinary Thunderstorms,William Boyd,8,4,3,7,3,IAIN
+A Farewell To Arms,Ernest Hemmingway,5,4,5.5,7.5,7,JETHRO
 Cutting for Stone,Abraham Vergese,10,6,6.2,6,7.5,STRINGS
 Half a Yellow Sun,Chimamanda Adichie,6,7,6.5,7.5,5,NEIL
 It's Your Time You're Wasting,Frank Chalk,4,4,4.8,5,5,STRETCH
-Alone in Berlin,Geoff Wilkes,7,5,6.5,8.5,7,JETHRO
-One Day,David Nicholls,7,5,5.2,5,7,IAIN
+Alone in Berlin,Geoff Wilkes,7,5,6.5,8.5,7,IAIN
+One Day,David Nicholls,7,5,5.2,5,7,JETHRO
 Love Songs from a Shallow Grave,Colin Cotterill,6.5,5,5,7.5,6.5,STRINGS
 Now You're One of Us,Asa Nonami,3,4,2.2,n/a,3,NEIL
-Town Like Alice,Neville Shute,6.7,5,5.3,5,7,STRETCH
-Never Let Me Go,Kazuo Ishiguru,4,6.5,5,8,7,JETHRO
+Town Like Alice,Neville Shute,6.7,5,5.3,5,7,IAIN
+Never Let Me Go,Kazuo Ishiguru,4,6.5,5,8,7,NEIL
 The Finkler Question,Howard Jacobson,6,4.5,4,4,2,IAIN
 The Big Sleep,Raymond Chandler,5.5,n/a,5.4,7.5,7.4,STRINGS
 In the Skin of a Lion,Michael Ondaatje,4.8,7,4.9,6.5,5.5,NEIL
 Do Androids Dream of Electric Sheep,Philip Dick,3,1.1,6,8,6.8,STRETCH
 Chasing the Sun,Richard Cohen,4.2,5,2,n/a,6,JETHRO
-House of the Hanged,Mark Mills,7,5.5,4.1,n/a,7,IAIN
+House of the Hanged,Mark Mills,7,5.5,4.1,n/a,7,STRINGS
 Silks,Dick Francis,6,7,5.3,n/a,6,NEIL
 Empire Falls,Richard Russo,7.8,4,7.5,8.2,n/a,STRETCH
 Bounce,Matthew Syed,6.9,4,4.9,8,8,JETHRO
@@ -48,3 +48,6 @@ Middlesex,Jeffrey Eugenides,5.9,5,7.1,6,6.6,STRETCH
 Sense of an Ending,Julian Barnes,5.9,4.5,7.5,8,6.8,JETHRO
 The Pilgrimage of Henry Fry,Rachel Joyce,6,6.5,5.4,7.5,6.8,IAIN
 Dark Winter,David Marks,n/a,n/a,n/a,n/a,n/a,STRINGS
+Gates of Fire,Steven Pressfield,n/a,n/a,n/a,n/a,n/a,NEIL
+Zen and the Art of Motorcycle Maintenance,Robert Persig,3,7,7.6,n/a,n/a,STRETCH
+Solar,Ian McEwan,n/a,n/a,n/a,n/a,n/a,JETHRO

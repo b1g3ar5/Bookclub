@@ -4,6 +4,7 @@ module CsvDatabase
     (
 		Record,
 		Db,
+		Selector(..),
 		LValue (LN, LS),
 		exec,
 		Col,
@@ -12,11 +13,13 @@ module CsvDatabase
 		fromDb,
 		fromTdb,
 		fromCsv,
-		Tdb
+		Tdb,
+		sortdb
     ) where
 
 import Control.Applicative
 import Data.Monoid
+import Data.List
 -- Hide a few names that are provided by Applicative.
 import Text.ParserCombinators.Parsec hiding ( many, optional, (<|>))
 
@@ -66,7 +69,7 @@ type Tdb = [Col]
 
 -- Writes a Db as a html table
 instance Show Db where 
-	show db = "<table>" ++ (write_header (head db)) ++ (concatMap show (tail db)) ++ "</table>"
+	show db = "<table>" ++ (write_header (head db)) ++ (concatMap show db) ++ "</table>"
 
 -- Writes a Record as a html table-record
 -- where each field is a <td>
@@ -170,40 +173,17 @@ apply (s, vf) r = case select s r of
 exec :: Query -> Db -> [Record]
 exec = (flip . foldl . flip) (filter . apply)
 
+sortdb :: Selector -> Db -> Db
+sortdb s db = sortBy (\a b -> compare (select s b) (select s a)) db
+
 -- folds a function over a LValue only if it is a Maybe Double list
-mfoldl::(Double->Double->Double)->LValue->Double
-mfoldl f xs = 	foldl (\a x -> case x of
+mfoldl::(Double->Double->Double)->Double->LValue->Double
+mfoldl f acc xs = 	foldl (\a x -> case x of
 						Just n -> f a n
 						Nothing -> a
-				    ) 0.0 ld
+				    ) acc ld
 				where ld = case xs of
 					LN ln -> ln
 					LS ls -> [] 
 
 					
-{-			
-csv :: Csv
-csv =
-  [ ["Name" , "City"      ]
-     -------  ------------                                                      
-  , ["Will" , "London"    ]
-  , ["John" , "London"    ]
-  , ["Chris", "Manchester"]
-  , ["Colin", "Liverpool" ]
-  , ["Nick" , "London"    ]
-  ]
-Then, we construct a simple query:
-
--- "Name"="*i*" @2="London"                                                     
-query :: Query
-query =
-  [ (FieldName "Name", [Wildcard, Char 'i', Wildcard])
-  , (FieldIndex 2,
-      [Char 'L', Char 'o', Char 'n', Char 'd', Char 'o', Char 'n'])
-  ]
-And, indeed, running our query against the database yields:
-
-> exec query (fromCsv csv)
-[[("Name","Will"),("City","London")],[("Name","Nick"),("City","London")]]					
-					
--}
