@@ -3,6 +3,9 @@
 module CsvDatabase
     (
 		Record,
+		popRecord,
+		popField,
+		tailTdb,
 		Db,
 		Selector(..),
 		LValue (LN, LS),
@@ -12,9 +15,11 @@ module CsvDatabase
 		mfoldl,
 		fromDb,
 		fromTdb,
+		apply,
 		fromCsv,
 		Tdb,
-		sortdb
+		sortdb,
+		CParser(..)
     ) where
 
 import Control.Applicative
@@ -38,6 +43,11 @@ import CsvParser
 -- We have 2 types, string or numbers = Maybe Double
 -- So, strings are NOT NULL, NULL = Nothing in the Maybe Double
 data LValue = LS [String] | LN [Maybe Double] deriving (Eq, Ord)
+
+tailLv::LValue->LValue
+tailLv lv = case lv of
+				LS ss -> LS $ tail ss
+				LN ns -> LN $ tail ns
 
 -- Overide the standard show
 instance Show (Maybe Double) where
@@ -69,6 +79,7 @@ type Tdb = [Col]
 
 -- Writes a Db as a html table
 instance Show Db where 
+	show [] = "<table></table>"
 	show db = "<table>" ++ (write_header (head db)) ++ (concatMap show db) ++ "</table>"
 
 -- Writes a Record as a html table-record
@@ -82,23 +93,33 @@ instance Show Record where
 write_header::Record->String
 write_header r = "<tr>" ++ concatMap (\f ->"<th>" ++ fst f ++ "</th>") (r) ++ "</tr>"
 	
+tailCol::Col->Col
+tailCol c = (fst c, tailLv $ snd c)
+		
 -- Add a field to a column
 -- If one of the fields is a string then we get a sring
-addField::Field->Col->Col
-addField fld col = case (fst fld == fst col) of
+pushField::Field->Col->Col
+pushField fld col = case (fst fld == fst col) of
 						True -> ( fst fld, lv `mappend` snd col )
 								where lv = case (snd fld) of 
 												N n -> LN [n]
 												S s -> LS [s]
 						False -> col -- adds nothing
 
-addcc::Col->Col->Col
-addcc c1 c2 = (fst c1, (snd c1) `mappend` (snd c2))
+popField::Col->Field
+popField c = case snd c of -- This is a fiddle because if [] there's something wrong
+				LN [] -> (fst c, N Nothing)
+				LS [] -> (fst c, N Nothing)
+				LN (h:ts) -> (fst c, N h)
+				LS (h:ts) -> (fst c, S h)
 		
 -- Add a Record to a Tdb (transposed Db)
-addRecord::Record->Tdb->Tdb
-addRecord r tdb = zipWith addcc (rec2tdb r) tdb
-						
+pushRecord::Record->Tdb->Tdb
+pushRecord = zipWith pushField
+											
+popRecord::Tdb->Record
+popRecord tdb = map popField tdb
+		
 -- Turn a field into a column
 field2col::Field->Col
 field2col f = (fst f, lv)
@@ -106,23 +127,25 @@ field2col f = (fst f, lv)
 						N n -> LN [n]
 						S s -> LS [s]
 					
-
 -- Turn a record into a Tdb						
 rec2tdb::Record->Tdb
 rec2tdb = map field2col						
 
 -- Turn a Db into a Tdb
 fromDb::Db->Tdb
-fromDb db = foldl (flip addRecord) (rec2tdb $ head db) (tail db)
+fromDb db = foldl (flip pushRecord) (rec2tdb $ head db) (tail db)
+		
+tailTdb::Tdb->Tdb
+tailTdb tdb = map tailCol tdb
 		
 --Turn a Tdb into a Db
 fromTdb::Tdb->Db
-fromTdb [] = []
-fromTdb tdb = case snd $ head tdb of
-				LN (h:ts)->[(map (\c->(fst c, N h)) tdb)] ++ (fromTdb (map (\c->(fst c, LN ts)) tdb))
-				LN []   ->[]
-				LS (h:ts)->[(map (\c->(fst c, S h)) tdb)] ++ (fromTdb (map (\c->(fst c, LS ts)) tdb))
-				LS []   ->[]
+fromTdb tdb = fromTdb' tdb []
+    where fromTdb'::Tdb->Db->Db
+          fromTdb' tdb db = case snd (head tdb) of
+								LN [] -> db
+								LS [] -> db
+								_     -> fromTdb' (tailTdb tdb) ((popRecord tdb):db)
 
 isdouble::Col->Bool
 isdouble c = case (snd c) of
@@ -141,10 +164,10 @@ fromCsv (h:rs) =  map (\r-> zipWith (\hf rf ->
 
 type Query = [Filter]
 type Filter = (Selector, ValueFilter)
-data Selector = FieldName String | FieldIndex Int
+data Selector = FieldName String | FieldIndex Int deriving (Show)
 
 type ValueFilter = [CParser]
-data CParser = Char Char | Wildcard
+data CParser = Char Char | Wildcard deriving (Show)
 
 cparse :: CParser -> String -> [String]
 cparse (Char c) (c' : cs') | c == c' = [cs']

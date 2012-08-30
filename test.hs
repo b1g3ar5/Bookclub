@@ -19,15 +19,22 @@ import System.IO
 
 main :: IO ()
 main = do
-	ss <- readFile "./csv/hitParade.csv"
-	cc <- parse csvFile "page" ss
-	putStrLn ss
-	putStrLn cc
-	--dd <- fromCsv cc
-	--sdd <- (sortdb (FieldName "STRINGS")) 
-	--ndd <- (sortdb (FieldName "STRETCH")) dd
-	--show sdd
-	--show ndd
+	let ss = readFile "./csv/scoreTable.csv"
+	let db = liftM simple_csv2db ss
+	let sdd = liftM (sortdb (FieldName "STRINGS")) db
+	let ndd = liftM (sortdb (FieldName "STRETCH")) db
+	let name = "STRINGS"
+	let vf = map (\c->Char c) name
+	let f = (FieldName "Book Picker", vf)
+	let q = [f]
+	let fdb = liftM (exec q) db
+	let ftdb = liftM fromDb fdb	
+	let ncols = liftM (filter isdouble) ftdb
+	let nys = liftM (map (\c->snd c)) ncols
+	maxs <- liftM (map (\c->mmax c)) nys
+	putStrLn $ show maxs
+
+
 
 simple_csv2db::String->Db
 simple_csv2db input = case parse csvFile "page" input of
