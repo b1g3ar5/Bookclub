@@ -3,7 +3,7 @@
 	<axis_category orientation='diagonal_down' size='10'/>
 	<chart_rect x='40' y='80' width='600' height='350' />
 	<legend x='40' y='15' width='600' height='50' />
-	<chart_data><row><null/>
+	<draw><text shadow='shadow1' color='ffffee' alpha='75' rotation='0' size='50' x='40' y='15' width='600' height='50' h_align='left' v_align='top'>Scores Given</text></draw><chart_data><row><null/>
 <string>STRINGS</string>
 <string>NEIL</string>
 <string>STRETCH</string>

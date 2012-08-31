@@ -142,7 +142,7 @@ bespokeCompiler::(String->Page String)->Compiler Resource (Page String)
 bespokeCompiler = (getResourceString >>^)
 
 scoreTableCompiler = bespokeCompiler (csv2ml show)
-nameCompiler n = bespokeCompiler (csv2ml (show.(sortdb (FieldName n))))
+nameCompiler n = bespokeCompiler (csv2ml (show.(sortdb (CellName n))))
 scoreChartCompiler = bespokeCompiler (csv2ml (write_chart . fromDb))	
 meannessChartCompiler = bespokeCompiler (csv2ml (write_meanness_chart . fromDb))	
 chooserChartCompiler n = bespokeCompiler (csv2ml ((write_chooser_chart n) . fromDb))	

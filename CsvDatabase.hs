@@ -2,15 +2,17 @@
 
 module CsvDatabase
     (
-		Record,
-		popRecord,
-		popField,
+		Row,
+		popRow,
+		popCell,
+        string2vf,
 		tailTdb,
 		Db,
 		Selector(..),
-		LValue (LN, LS),
+		ColValue(..),
 		exec,
 		Col,
+		dselect,
 		isdouble,
 		mfoldl,
 		fromDb,
@@ -42,39 +44,39 @@ import CsvParser
 
 -- We have 2 types, string or numbers = Maybe Double
 -- So, strings are NOT NULL, NULL = Nothing in the Maybe Double
-data LValue = LS [String] | LN [Maybe Double] deriving (Eq, Ord)
+data ColValue = ColS [String] | ColN [Maybe Double] deriving (Eq, Ord)
 
-tailLv::LValue->LValue
+tailLv::ColValue->ColValue
 tailLv lv = case lv of
-				LS ss -> LS $ tail ss
-				LN ns -> LN $ tail ns
+				ColS ss -> ColS $ tail ss
+				ColN ns -> ColN $ tail ns
 
 -- Overide the standard show
 instance Show (Maybe Double) where
 	show (Just v) = show v
 	show Nothing = ""
 	
-instance Monoid LValue where
+instance Monoid ColValue where
 	mappend l1 l2 = case (l1, l2) of
-					(LN ln1, LN ln2) -> LN (ln1++ln2)
-					(LN ln1, LS ls2) -> LS ((map show ln1)++ls2)
-					(LS ls1, LN ln2) -> LS (ls1++ (map show ln2))
-					(LS ls1, LS ls2) -> LS (ls1++ls2)
-	mempty = LN []
+					(ColN ln1, ColN ln2) -> ColN (ln1++ln2)
+					(ColN ln1, ColS ls2) -> ColS ((map show ln1)++ls2)
+					(ColS ls1, ColN ln2) -> ColS (ls1++ (map show ln2))
+					(ColS ls1, ColS ls2) -> ColS (ls1++ls2)
+	mempty = ColN []
 
 -- Shows the LValue in a column - for the xml file for charts package
 -- Shows the strings for when it's eg the names of the books
 -- Shows the numbers for when it's eg the scores
-instance Show LValue where
-	show (LN ln) = concatMap (\md-> "<number>" ++ show md ++ "</number>" ) ln
-	show (LS ls) = concatMap (\ms-> "<string>" ++ ms ++ "</string>" ) ls	
+instance Show ColValue where
+	show (ColN ln) = concatMap (\md-> "<number>" ++ show md ++ "</number>" ) ln
+	show (ColS ls) = concatMap (\ms-> "<string>" ++ ms ++ "</string>" ) ls	
 
 	
 type Csv = [[Value]]
-type Db = [Record]
-type Record = [Field]
-type Field = (String, Value)	-- key, value
-type Col = (String, LValue)   	-- ie. all the same field - we need to make them all doubles or all strings...
+type Db = [Row]
+type Row = [Cell]
+type Cell = (String, Value)	-- key, value
+type Col = (String, ColValue)   	-- ie. all the same field - we need to make them all doubles or all strings...
 type Tdb = [Col]
 
 -- Writes a Db as a html table
@@ -84,13 +86,13 @@ instance Show Db where
 
 -- Writes a Record as a html table-record
 -- where each field is a <td>
-instance Show Record where
+instance Show Row where
 	show r = "<tr>" ++ concatMap (\f -> "<td>" ++ show (snd f) ++ "</td>") r ++ "</tr>"
 		
 -------------------------------------------------------------------------
 -- Writes a header from the strings of each field
 -------------------------------------------------------------------------
-write_header::Record->String
+write_header::Row->String
 write_header r = "<tr>" ++ concatMap (\f ->"<th>" ++ fst f ++ "</th>") (r) ++ "</tr>"
 	
 tailCol::Col->Col
@@ -98,42 +100,42 @@ tailCol c = (fst c, tailLv $ snd c)
 		
 -- Add a field to a column
 -- If one of the fields is a string then we get a sring
-pushField::Field->Col->Col
-pushField fld col = case (fst fld == fst col) of
+pushCell::Cell->Col->Col
+pushCell fld col = case (fst fld == fst col) of
 						True -> ( fst fld, lv `mappend` snd col )
 								where lv = case (snd fld) of 
-												N n -> LN [n]
-												S s -> LS [s]
+												N n -> ColN [n]
+												S s -> ColS [s]
 						False -> col -- adds nothing
 
-popField::Col->Field
-popField c = case snd c of -- This is a fiddle because if [] there's something wrong
-				LN [] -> (fst c, N Nothing)
-				LS [] -> (fst c, N Nothing)
-				LN (h:ts) -> (fst c, N h)
-				LS (h:ts) -> (fst c, S h)
+popCell::Col->Cell
+popCell c = case snd c of -- This is a fiddle because if [] there's something wrong
+				ColN [] -> (fst c, N Nothing)
+				ColS [] -> (fst c, N Nothing)
+				ColN (h:ts) -> (fst c, N h)
+				ColS (h:ts) -> (fst c, S h)
 		
 -- Add a Record to a Tdb (transposed Db)
-pushRecord::Record->Tdb->Tdb
-pushRecord = zipWith pushField
+pushRow::Row->Tdb->Tdb
+pushRow = zipWith pushCell
 											
-popRecord::Tdb->Record
-popRecord tdb = map popField tdb
+popRow::Tdb->Row
+popRow tdb = map popCell tdb
 		
 -- Turn a field into a column
-field2col::Field->Col
-field2col f = (fst f, lv)
+cell2col::Cell->Col
+cell2col f = (fst f, lv)
 				where lv = case snd f of
-						N n -> LN [n]
-						S s -> LS [s]
+						N n -> ColN [n]
+						S s -> ColS [s]
 					
 -- Turn a record into a Tdb						
-rec2tdb::Record->Tdb
-rec2tdb = map field2col						
+row2tdb::Row->Tdb
+row2tdb = map cell2col						
 
 -- Turn a Db into a Tdb
 fromDb::Db->Tdb
-fromDb db = foldl (flip pushRecord) (rec2tdb $ head db) (tail db)
+fromDb db = foldl (flip pushRow) (row2tdb $ head db) (tail db)
 		
 tailTdb::Tdb->Tdb
 tailTdb tdb = map tailCol tdb
@@ -143,14 +145,14 @@ fromTdb::Tdb->Db
 fromTdb tdb = fromTdb' tdb []
     where fromTdb'::Tdb->Db->Db
           fromTdb' tdb db = case snd (head tdb) of
-								LN [] -> db
-								LS [] -> db
-								_     -> fromTdb' (tailTdb tdb) ((popRecord tdb):db)
+								ColN [] -> db
+								ColS [] -> db
+								_     -> fromTdb' (tailTdb tdb) ((popRow tdb):db)
 
 isdouble::Col->Bool
 isdouble c = case (snd c) of
-				LN n -> True
-				LS s -> False
+				ColN n -> True
+				ColS s -> False
 				
 
 -- The headers are the first row, turned into strings, if not already
@@ -162,12 +164,19 @@ fromCsv (h:rs) =  map (\r-> zipWith (\hf rf ->
 												N dhf->(show dhf, rf)
 									) h r) rs
 
+-- A list of CellName, Value pairs - ie. the WHERE bit of an SQL statement
 type Query = [Filter]
+-- A pair of CellName and what we want the Value of it to be
 type Filter = (Selector, ValueFilter)
-data Selector = FieldName String | FieldIndex Int deriving (Show)
+-- What we want the cell name/index to be
+data Selector = CellName String | CellIndex Int deriving (Show)
 
 type ValueFilter = [CParser]
 data CParser = Char Char | Wildcard deriving (Show)
+
+-- Turn a string into a ValueFilter
+string2vf::String->ValueFilter
+string2vf s = map (\c->Char c) s
 
 cparse :: CParser -> String -> [String]
 cparse (Char c) (c' : cs') | c == c' = [cs']
@@ -182,31 +191,37 @@ filterValue ps (S cs) = any null (go ps cs)
     go [] cs       = [cs]
     go (p : ps) cs = concatMap (go ps) (cparse p cs)
 
-select :: Selector -> Record -> Maybe Value
-select (FieldName s) r                           = lookup s r
-select (FieldIndex n) r | n > 0 && n <= length r = Just (snd (r !! (n - 1)))
+select :: Selector -> Row -> Maybe Value
+select (CellName s) r                           = lookup s r
+select (CellIndex n) r | n > 0 && n <= length r = Just (snd (r !! (n - 1)))
                         | otherwise              = Nothing
 
-
-apply :: Filter -> Record -> Bool
+-- This is a SELECT statement for all of a column (ie. no WHERE)
+dselect :: Selector -> Tdb -> Maybe ColValue
+dselect (CellName s) tdb                           = lookup s tdb
+dselect (CellIndex n) tdb | n > 0 && n <= length tdb = Just (snd (tdb !! (n - 1)))
+                          | otherwise              = Nothing						
+						
+apply :: Filter -> Row -> Bool
 apply (s, vf) r = case select s r of
   Nothing -> False
   Just v  -> filterValue vf v
-  
-exec :: Query -> Db -> [Record]
+
+-- This is a WHERE statement - getting all the columns - ie. a sub db
+exec :: Query -> Db -> [Row]
 exec = (flip . foldl . flip) (filter . apply)
 
 sortdb :: Selector -> Db -> Db
 sortdb s db = sortBy (\a b -> compare (select s b) (select s a)) db
 
 -- folds a function over a LValue only if it is a Maybe Double list
-mfoldl::(Double->Double->Double)->Double->LValue->Double
+mfoldl::(Double->Double->Double)->Double->ColValue->Double
 mfoldl f acc xs = 	foldl (\a x -> case x of
 						Just n -> f a n
 						Nothing -> a
 				    ) acc ld
 				where ld = case xs of
-					LN ln -> ln
-					LS ls -> [] 
+					ColN ln -> ln
+					ColS ls -> [] 
 
 					
