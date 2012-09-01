@@ -105,7 +105,7 @@ stat mds =  Stat {smax=mmax mds, smin=mmin mds, smean=mmean mds, ssd=mstd mds, s
 		   
 -- Works out the Box stats from am LValue
 box::ColValue->Box
-box mds =  Box {bopen=smean s - ssd s, bhi=smax s, blo=smin s, bclose=smean s + ssd s, bcount=scount s}
+box mds =  Box {bopen=smean s + ssd s, bhi=smax s, blo=smin s, bclose=smean s - ssd s, bcount=scount s}
 				where 
                     s = stat mds		   
 
@@ -125,10 +125,11 @@ colStat tdb name = case dselect (CellName name) tdb of
 
 -- Works out the Box stats for a all numerical columns in a Tdb 
 dbBox::Tdb->Box		 
-dbBox tdb = Box {bopen = lmean-lsd, bhi=maximum maxs, blo=minimum mins, bclose=lmean+lsd, bcount=sum counts}
+dbBox tdb = Box {bopen = lmean+lsd, bhi=maximum maxs, blo=minimum mins, bclose=lmean-lsd, bcount=sum counts}
               where
-                names = map fst tdb
-                cs = map (colStat tdb) names
+                ncols = filter isdouble tdb
+                names = map fst ncols
+                cs = map (colStat ncols) names
                 maxs = map smax cs
                 mins = map smin cs
                 means = map smean cs

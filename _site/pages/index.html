@@ -63,9 +63,21 @@
 			<div id="content">
 				<div class="post">
 					<div class="postentry">
-						This is a web site built so that I could learn Hakyll and at the same time produce some statistics 
-about the books that we have read.
+						<h1 id="what-its-about">What it's about</h1>
+<p>This is a web site built so that I could learn Hakyll and how to draw graphs on a web site, and at the same time produce some statistics about the books that we have read.</p>
+<h2 id="latex">LaTex</h2>
+<p>Let's try some LaTex:</p>
+<p><span class="math">$\begin{equation} \left( c \alpha \cdot \hat{p} + \beta m c^2 \right) \psi = i \hbar \frac{\partial \psi}{\partial t} \end{equation}$</span></p>
+<h2 id="code">Code</h2>
+<p>Now some code:</p>
+<pre><code>main :: IO ()
+main = hakyll $ do
 
+-- This creates an include file for the scoreTable page
+    scoreTable &lt;- match &quot;csv/scoreTable.csv&quot; $ do
+        compile $ scoreTableCompiler
+            &gt;&gt;&gt; addDefaultFields</code></pre>
+<p>Did that look OK?</p>
 					</div>
 				</div>
 			</div>
@@ -75,19 +87,19 @@ about the books that we have read.
 						<ul>
 							<h2>Scorer Hit Parade</h2>
 							<li>
-								<a href="../pages/strings.html">Strings</a>
+								<a href="../pages/stringsTable.html">Strings</a>
 							</li>
 							<li>
-								<a href="../pages/neil.html">Neil</a>
+								<a href="../pages/neilTable.html">Neil</a>
 							</li>
 							<li>
-								<a href="../pages/stretch.html">Stretch</a>
+								<a href="../pages/stretchTable.html">Stretch</a>
 							</li>
 							<li>
-								<a href="../pages/jethro.html">Jethro</a>
+								<a href="../pages/jethroTable.html">Jethro</a>
 							</li>
 							<li>
-								<a href="../pages/iain.html">Iain</a>
+								<a href="../pages/iainTable.html">Iain</a>
 							</li>
 						</ul>
 						<ul>
@@ -105,7 +117,7 @@ about the books that we have read.
 								<a href="../pages/jethroChart.html">Jethro</a>
 							</li>
 							<li>
-								<a href="../pages/iain.html">Iain</a>
+								<a href="../pages/iainChart.html">Iain</a>
 							</li>
 						</ul>
 					</li>

@@ -40,78 +40,78 @@ main :: IO ()
 main = hakyll $ do
 
 -- This creates an include file for the scoreTable page
-	scoreTable <- match "csv/scoreTable.csv" $ do
+    scoreTable <- match "csv/scoreTable.csv" $ do
 		compile $ scoreTableCompiler
 			>>> addDefaultFields
 
-	strings <- group("strings") $ do
+    strings <- group("strings") $ do
 		match "csv/scoreTable.csv" $ do
 		compile $ nameCompiler "STRINGS"
 			>>> addDefaultFields
 
-	stretch <- group("stretch") $ do
+    stretch <- group("stretch") $ do
 		match "csv/scoreTable.csv" $ do
 		compile $ nameCompiler "STRETCH"
 			>>> addDefaultFields
 
-	neil <- group("neil") $ do
+    neil <- group("neil") $ do
 		match "csv/scoreTable.csv" $ do
 		compile $ nameCompiler "NEIL"
 			>>> addDefaultFields
 
-	jethro <- group("jethro") $ do
+    jethro <- group("jethro") $ do
 		match "csv/scoreTable.csv" $ do
 		compile $ nameCompiler "JETHRO"
 			>>> addDefaultFields
 
-	iain <- group("iain") $ do
+    iain <- group("iain") $ do
 		match "csv/scoreTable.csv" $ do
 		compile $ nameCompiler "IAIN"
 			>>> addDefaultFields
 	
 -- This creates the xml file for the graph in the scoreChart page
-	group("scoreChart") $ do
+    group("scoreChart") $ do
 		match "csv/scoreTable.csv" $ do
 			route $ gsubRoute "csv/scoreTable.csv" (const "xml/scoreChart.xml")
 			compile $ scoreChartCompiler
 				>>> addDefaultFields
-				>>> applyTemplateCompiler "templates/chart.html"
+				>>> applyTemplateCompiler "templates/chart.xml"
 	
 	
 -- This creates the xml file for the graph in the choserChart page
-	group("chooserChart") $ do
+    group("chooserChart") $ do
 		match "csv/scoreTable.csv" $ do
 			route $ customRoute (\_->"xml/chooserChart.xml")
-			compile $ chooserChartCompiler "STRETCH"
+			compile $ allChooserChartCompiler
 				>>> addDefaultFields
-				>>> applyTemplateCompiler "templates/chart.html"
+				>>> applyTemplateCompiler "templates/chart.xml"
 	
 -- This creates the xml file for the graph in the meannessChart page
-	group("meannessChart") $ do
+    group("meannessChart") $ do
 		match "csv/scoreTable.csv" $ do
 			route $ customRoute (\_->"xml/meannessChart.xml")
 			compile $ meannessChartCompiler
 				>>> addDefaultFields
-				>>> applyTemplateCompiler "templates/chart.html"
+				>>> applyTemplateCompiler "templates/chart.xml"
 				
 	-- Copy the sytle guides
-	match "css/*" $ do
+    match "css/*" $ do
 		route   idRoute
 		compile compressCssCompiler
 
     -- Copy all the files required for the charts - including sub directories
-	match "charts/**" $ do
+    match "charts/**" $ do
 		route   idRoute
 		compile copyFileCompiler
 
     -- Compile the templates for use later
-	match "templates/*" $ compile templateCompiler
+    match "templates/*" $ compile templateCompiler
 
     -- Copy all the pages
 	-- Note readPageCompiler so Pandoc not called
 	-- Also the csvs are all included (but there is only one becasue there is one file
 	-- in the csv directory above
-	match "pages/*" $ do
+    match (predicate (\i -> (matches "pages/*" i) && (not (matches "pages/*Chart.html" i)) && (not (matches "pages/*.md" i)))) $ do
 		route   $ setExtension ".html"
 		compile $ readPageCompiler
 			>>> requireAll scoreTable (foldr includeFile) 
@@ -125,7 +125,74 @@ main = hakyll $ do
 			>>> applyTemplateCompiler "templates/default.html"
 			>>> relativizeUrlsCompiler
 
-		
+    match "pages/*Chart.html" $ do
+        route   $ setExtension ".html"
+        compile $ readPageCompiler
+            >>> addDefaultFields 
+            >>> arr applySelf 
+            >>> applyTemplateCompiler "templates/chart.html"
+            >>> applyTemplateCompiler "templates/default.html"
+            >>> relativizeUrlsCompiler
+
+    match "pages/*.md" $ do
+        route   $ setExtension "html"
+        compile $ readPageCompiler
+            >>> addDefaultFields
+            >>> arr applySelf
+            >>> pageRenderPandoc
+            >>> applyTemplateCompiler "templates/default.html"
+            >>> relativizeUrlsCompiler
+
+    group("jethroChart") $ do
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/jethroChart.xml")
+            compile $ chooserChartCompiler "JETHRO"
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"      
+ 
+    group("iainChart") $ do
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/iainChart.xml")
+            compile $ chooserChartCompiler "IAIN"
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"      
+ 
+    group("stringsChart") $ do
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/stringsChart.xml")
+            compile $ chooserChartCompiler "STRINGS"
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"      
+ 
+    group("stretchChart") $ do
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/stretchChart.xml")
+            compile $ chooserChartCompiler "STRETCH"
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"      
+ 
+    group("neilChart") $ do
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/neilChart.xml")
+            compile $ chooserChartCompiler "NEIL"
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"      
+     
+    where
+        db = simple_csv2db "/csv/scoreTable.csv"
+        tdb = fromDb db
+        ncols = filter isdouble tdb
+        pickers = map fst ncols
+
+		    
+chooserGroup::String->RulesM (Pattern (Page String))
+chooserGroup n =  	group(n ++ "Chart") $ do
+                        match "csv/scoreTable.csv" $ do
+                            route $ customRoute (\_->"xml/" ++ n ++ "Chart.xml")
+                            compile $ chooserChartCompiler n
+                                >>> addDefaultFields
+                                >>> applyTemplateCompiler "templates/chart.xml"
+
 
 -- Include a file in a page. A fil called csv/scoreTable.csv
 -- will be available in the $ScoreTable$ variable. 
@@ -143,9 +210,10 @@ bespokeCompiler = (getResourceString >>^)
 
 scoreTableCompiler = bespokeCompiler (csv2ml show)
 nameCompiler n = bespokeCompiler (csv2ml (show.(sortdb (CellName n))))
-scoreChartCompiler = bespokeCompiler (csv2ml (write_chart . fromDb))	
-meannessChartCompiler = bespokeCompiler (csv2ml (write_meanness_chart . fromDb))	
-chooserChartCompiler n = bespokeCompiler (csv2ml ((write_chooser_chart n) . fromDb))	
+scoreChartCompiler = bespokeCompiler (csv2ml (writeChart . fromDb))	
+meannessChartCompiler = bespokeCompiler (csv2ml (writeMeannessChart . fromDb))	
+chooserChartCompiler n = bespokeCompiler (csv2ml ((writeChooserChart n) . fromDb))	
+allChooserChartCompiler = bespokeCompiler (csv2ml ((writeAllChooserChart) . fromDb))	
 
 -------------------------------------------------------------------------		
 -- My ripoff of the readPage for csv pages
