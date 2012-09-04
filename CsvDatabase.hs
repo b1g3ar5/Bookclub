@@ -64,7 +64,7 @@ instance Monoid ColValue where
 					(ColS ls1, ColS ls2) -> ColS (ls1++ls2)
 	mempty = ColN []
 
--- Shows the LValue in a column - for the xml file for charts package
+-- Shows the ColValue in a column - for the xml file for charts package
 -- Shows the strings for when it's eg the names of the books
 -- Shows the numbers for when it's eg the scores
 instance Show ColValue where

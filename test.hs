@@ -20,12 +20,12 @@ import System.IO
 main :: IO ()
 main = do
 	let ss = readFile "./csv/scoreTable.csv"
-	let db = liftM simple_csv2db ss
-	let sdd = liftM (sortdb (FieldName "STRINGS")) db
-	let ndd = liftM (sortdb (FieldName "STRETCH")) db
+	let db = liftM csv2db ss
+	let sdd = liftM (sortdb (CellName "STRINGS")) db
+	let ndd = liftM (sortdb (CellName "STRETCH")) db
 	let name = "STRINGS"
 	let vf = map (\c->Char c) name
-	let f = (FieldName "Book Picker", vf)
+	let f = (CellName "Book Picker", vf)
 	let q = [f]
 	let fdb = liftM (exec q) db
 	let ftdb = liftM fromDb fdb	
@@ -36,8 +36,8 @@ main = do
 
 
 
-simple_csv2db::String->Db
-simple_csv2db input = case parse csvFile "page" input of
+csv2db::String->Db
+csv2db input = case parse csvFile "page" input of
 						Left err -> error (show err)
 						Right (b) -> fromCsv b
 

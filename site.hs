@@ -1,25 +1,9 @@
 {-# LANGUAGE OverloadedStrings, Arrows #-}
 
- {-
-module Site (
-	main
-	,csv2ml
-	,includeFile
-	,scoreTableCompiler
-	,scoreChartCompiler
-	,csv2db
-	,simple_csv2db
-	,write_chart
-	,write_chart_xs
-	,write_chart_y,
-	getField
-) where
- -}
-
 import Control.Arrow ((>>>))
 import Prelude hiding (id)
 import Control.Category (id)
-import Control.Monad (forM_, liftM, liftM2)
+import Control.Monad (forM, forM_, liftM, liftM2)
 import Control.Arrow (arr, (>>^), (&&&), (>>>), (***), second)
 import Data.List hiding (group)
 import Data.Monoid (mempty, mconcat)
@@ -37,72 +21,54 @@ import Charts as C
 import System.IO
 
 main :: IO ()
-main = hakyll $ do
+main = do
+    -- We need the pickers so that we can make some compilers
+    pickers <- ioPickers
 
--- This creates an include file for the scoreTable page
+    hakyll $ do
+
+    -- This creates an include file for the scoreTable page
     scoreTable <- match "csv/scoreTable.csv" $ do
 		compile $ scoreTableCompiler
 			>>> addDefaultFields
 
-    strings <- group("strings") $ do
-		match "csv/scoreTable.csv" $ do
-		compile $ nameCompiler "STRINGS"
-			>>> addDefaultFields
-
-    stretch <- group("stretch") $ do
-		match "csv/scoreTable.csv" $ do
-		compile $ nameCompiler "STRETCH"
-			>>> addDefaultFields
-
-    neil <- group("neil") $ do
-		match "csv/scoreTable.csv" $ do
-		compile $ nameCompiler "NEIL"
-			>>> addDefaultFields
-
-    jethro <- group("jethro") $ do
-		match "csv/scoreTable.csv" $ do
-		compile $ nameCompiler "JETHRO"
-			>>> addDefaultFields
-
-    iain <- group("iain") $ do
-		match "csv/scoreTable.csv" $ do
-		compile $ nameCompiler "IAIN"
-			>>> addDefaultFields
-	
--- This creates the xml file for the graph in the scoreChart page
+    -- This creates include files for the sorted hitParade pages
+    incs <- forM pickers includeGroup
+    
+    -- This creates the xml file for the graph in the scoreChart page
     group("scoreChart") $ do
-		match "csv/scoreTable.csv" $ do
-			route $ gsubRoute "csv/scoreTable.csv" (const "xml/scoreChart.xml")
-			compile $ scoreChartCompiler
-				>>> addDefaultFields
-				>>> applyTemplateCompiler "templates/chart.xml"
+        match "csv/scoreTable.csv" $ do
+            route $ gsubRoute "csv/scoreTable.csv" (const "xml/scoreChart.xml")
+            compile $ scoreChartCompiler
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"
 	
 	
--- This creates the xml file for the graph in the choserChart page
+    -- This creates the xml file for the graph in the chooserChart page
     group("chooserChart") $ do
-		match "csv/scoreTable.csv" $ do
-			route $ customRoute (\_->"xml/chooserChart.xml")
-			compile $ allChooserChartCompiler
-				>>> addDefaultFields
-				>>> applyTemplateCompiler "templates/chart.xml"
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/chooserChart.xml")
+            compile $ allChooserChartCompiler
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"
 	
--- This creates the xml file for the graph in the meannessChart page
+    -- This creates the xml file for the graph in the meannessChart page
     group("meannessChart") $ do
-		match "csv/scoreTable.csv" $ do
-			route $ customRoute (\_->"xml/meannessChart.xml")
-			compile $ meannessChartCompiler
-				>>> addDefaultFields
-				>>> applyTemplateCompiler "templates/chart.xml"
+        match "csv/scoreTable.csv" $ do
+            route $ customRoute (\_->"xml/meannessChart.xml")
+            compile $ meannessChartCompiler
+                >>> addDefaultFields
+                >>> applyTemplateCompiler "templates/chart.xml"
 				
 	-- Copy the sytle guides
     match "css/*" $ do
-		route   idRoute
-		compile compressCssCompiler
+        route   idRoute
+        compile compressCssCompiler
 
     -- Copy all the files required for the charts - including sub directories
     match "charts/**" $ do
-		route   idRoute
-		compile copyFileCompiler
+        route   idRoute
+        compile copyFileCompiler
 
     -- Compile the templates for use later
     match "templates/*" $ compile templateCompiler
@@ -112,18 +78,14 @@ main = hakyll $ do
 	-- Also the csvs are all included (but there is only one becasue there is one file
 	-- in the csv directory above
     match (predicate (\i -> (matches "pages/*" i) && (not (matches "pages/*Chart.html" i)) && (not (matches "pages/*.md" i)))) $ do
-		route   $ setExtension ".html"
-		compile $ readPageCompiler
+        route   $ setExtension ".html"
+        compile $ readPageCompiler
 			>>> requireAll scoreTable (foldr includeFile) 
-			>>> requireAll strings (foldr (namedIncludeFile "strings") )
-			>>> requireAll stretch (foldr (namedIncludeFile "stretch") ) 
-			>>> requireAll neil (foldr (namedIncludeFile "neil") ) 
-			>>> requireAll jethro (foldr (namedIncludeFile "jethro") ) 
-			>>> requireAll iain (foldr (namedIncludeFile "iain") ) 
-			>>> addDefaultFields 
-			>>> arr applySelf 
-			>>> applyTemplateCompiler "templates/default.html"
-			>>> relativizeUrlsCompiler
+			>>> requireList incs -- This includes all the hitParade include files
+            >>> addDefaultFields 
+            >>> arr applySelf 
+            >>> applyTemplateCompiler "templates/default.html"
+            >>> relativizeUrlsCompiler
 
     match "pages/*Chart.html" $ do
         route   $ setExtension ".html"
@@ -143,48 +105,22 @@ main = hakyll $ do
             >>> applyTemplateCompiler "templates/default.html"
             >>> relativizeUrlsCompiler
 
-    group("jethroChart") $ do
-        match "csv/scoreTable.csv" $ do
-            route $ customRoute (\_->"xml/jethroChart.xml")
-            compile $ chooserChartCompiler "JETHRO"
-                >>> addDefaultFields
-                >>> applyTemplateCompiler "templates/chart.xml"      
- 
-    group("iainChart") $ do
-        match "csv/scoreTable.csv" $ do
-            route $ customRoute (\_->"xml/iainChart.xml")
-            compile $ chooserChartCompiler "IAIN"
-                >>> addDefaultFields
-                >>> applyTemplateCompiler "templates/chart.xml"      
- 
-    group("stringsChart") $ do
-        match "csv/scoreTable.csv" $ do
-            route $ customRoute (\_->"xml/stringsChart.xml")
-            compile $ chooserChartCompiler "STRINGS"
-                >>> addDefaultFields
-                >>> applyTemplateCompiler "templates/chart.xml"      
- 
-    group("stretchChart") $ do
-        match "csv/scoreTable.csv" $ do
-            route $ customRoute (\_->"xml/stretchChart.xml")
-            compile $ chooserChartCompiler "STRETCH"
-                >>> addDefaultFields
-                >>> applyTemplateCompiler "templates/chart.xml"      
- 
-    group("neilChart") $ do
-        match "csv/scoreTable.csv" $ do
-            route $ customRoute (\_->"xml/neilChart.xml")
-            compile $ chooserChartCompiler "NEIL"
-                >>> addDefaultFields
-                >>> applyTemplateCompiler "templates/chart.xml"      
-     
+    forM_ pickers chooserGroup
+    
     where
-        db = simple_csv2db "/csv/scoreTable.csv"
-        tdb = fromDb db
-        ncols = filter isdouble tdb
-        pickers = map fst ncols
+        -- There must be a better way of doing this
+        ss = readFile "./csv/scoreTable.csv"
+        db = liftM csv2db ss
+        tdb = liftM fromDb db
+        ncols = liftM (filter isdouble) tdb
+        ioPickers = liftM (map fst) ncols
+        
 
-		    
+requireList::[Pattern (Page String)]->Compiler (Page a) (Page a)
+requireList ps = foldr (>>>) (head cs) (tail cs)
+                where
+                    cs = map ((flip requireAll) (foldr namedIncludeFile)) ps
+        
 chooserGroup::String->RulesM (Pattern (Page String))
 chooserGroup n =  	group(n ++ "Chart") $ do
                         match "csv/scoreTable.csv" $ do
@@ -193,17 +129,22 @@ chooserGroup n =  	group(n ++ "Chart") $ do
                                 >>> addDefaultFields
                                 >>> applyTemplateCompiler "templates/chart.xml"
 
+includeGroup::String->RulesM (Pattern (Page String))
+includeGroup n = group(n) $ do
+                    match "csv/scoreTable.csv" $ do
+                        compile $ nameCompiler n
+                            >>> addDefaultFields >>> arr (setField "name" n)
 
--- Include a file in a page. A fil called csv/scoreTable.csv
+namedIncludeFile::Page String->Page a->Page a
+namedIncludeFile csv_file page = setField (getField "name" csv_file) (pageBody csv_file) page
+
+-- Include a file in a page. A file called csv/scoreTable.csv
 -- will be available in the $ScoreTable$ variable. 
 includeFile::Page String->Page a ->Page a
 includeFile csv_file page = 
 			let key=dropExtension $ takeFileName $ getField "path" csv_file
 			in setField key (pageBody csv_file) page
 		
-namedIncludeFile::String->Page String->Page a->Page a
-namedIncludeFile name csv_file page = setField name (pageBody csv_file) page
-
 		
 bespokeCompiler::(String->Page String)->Compiler Resource (Page String)
 bespokeCompiler = (getResourceString >>^)
@@ -219,18 +160,18 @@ allChooserChartCompiler = bespokeCompiler (csv2ml ((writeAllChooserChart) . from
 -- My ripoff of the readPage for csv pages
 -- It parses the page and then translates to a html table
 -------------------------------------------------------------------------
-csv2db::String->Page Db
-csv2db input = case parse csvFile "page" input of
+csv2PageDb::String->Page Db
+csv2PageDb input = case parse csvFile "page" input of
 						Left err -> error (show err)
 						Right (b) -> Page (M.fromList []) (fromCsv b) 
 
-simple_csv2db::String->Db
-simple_csv2db input = case parse csvFile "page" input of
+csv2db::String->Db
+csv2db input = case parse csvFile "page" input of
 						Left err -> error (show err)
 						Right (b) -> fromCsv b
 
 csv2tdb::String->Page Tdb
-csv2tdb s = fmap fromDb (csv2db s)
+csv2tdb s = fmap fromDb (csv2PageDb s)
 											
 -------------------------------------------------------------------------		
 -- Parses the page and then translates to a the xml for a score chart
@@ -241,31 +182,4 @@ csv2ml f input = case parse csvFile "page" input of
 						Right (b) -> Page (M.fromList []) (f $ fromCsv b) 												
 												
 			
-{-			
-
-:l site CsvStuff CsvParser CsvDatabase
-let ss = readFile "./csv/hitParade.csv"
-let dd = liftM simple_csv2db ss
-let sdd = liftM (sortdb (FieldName "STRINGS")) dd
-let ndd = liftM (sortdb (FieldName "STRETCH")) dd
-let name = "STRETCH"
-let vf = map (\c->Char c) name
-let f = (FeildName "Book Picker", vf)
-let q = [f]
-let fdb = exec q dd
-fdb
-
-
-	
-
-
-
-
-
-
-
-
-	
--}
-
 	
