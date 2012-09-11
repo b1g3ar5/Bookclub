@@ -2,26 +2,8 @@
 
 module CsvDatabase
     (
-		Row,
-		popRow,
-		popCell,
-        string2vf,
-		tailTdb,
-		Db,
-		Selector(..),
-		ColValue(..),
-		exec,
-		Col,
-		dselect,
-		isdouble,
-		mfoldl,
-		fromDb,
-		fromTdb,
-		apply,
-		fromCsv,
-		Tdb,
-		sortdb,
-		CParser(..)
+		Row, popRow, popCell, string2vf, tailTdb, Db, Selector(..), ColValue(..), exec, Col,
+		dselect, isdouble, mfoldl, fromDb, fromTdb, apply, fromCsv, Tdb, sortdb, CParser(..)
     ) where
 
 import Control.Applicative
@@ -33,7 +15,7 @@ import Text.ParserCombinators.Parsec hiding ( many, optional, (<|>))
 import Control.Arrow ((>>>))
 import Prelude hiding (id)
 import Control.Category (id)
-import Control.Monad (forM_, MonadPlus(..), ap)
+import Control.Monad (liftM, forM_, MonadPlus(..), ap)
 import Control.Arrow (arr, (>>^), (&&&), (>>>), (***), second)
 import Data.Monoid (mempty, mconcat)
 import qualified Data.Map as M
@@ -46,8 +28,8 @@ import CsvParser
 -- So, strings are NOT NULL, NULL = Nothing in the Maybe Double
 data ColValue = ColS [String] | ColN [Maybe Double] deriving (Eq, Ord)
 
-tailLv::ColValue->ColValue
-tailLv lv = case lv of
+tailColV::ColValue->ColValue
+tailColV lv = case lv of
 				ColS ss -> ColS $ tail ss
 				ColN ns -> ColN $ tail ns
 
@@ -70,7 +52,6 @@ instance Monoid ColValue where
 instance Show ColValue where
 	show (ColN ln) = concatMap (\md-> "<number>" ++ show md ++ "</number>" ) ln
 	show (ColS ls) = concatMap (\ms-> "<string>" ++ ms ++ "</string>" ) ls	
-
 	
 type Csv = [[Value]]
 type Db = [Row]
@@ -96,7 +77,7 @@ write_header::Row->String
 write_header r = "<tr>" ++ concatMap (\f ->"<th>" ++ fst f ++ "</th>") (r) ++ "</tr>"
 	
 tailCol::Col->Col
-tailCol c = (fst c, tailLv $ snd c)
+tailCol c = (fst c, tailColV $ snd c)
 		
 -- Add a field to a column
 -- If one of the fields is a string then we get a sring
@@ -109,12 +90,12 @@ pushCell fld col = case (fst fld == fst col) of
 						False -> col -- adds nothing
 
 popCell::Col->Cell
-popCell c = case snd c of -- This is a fiddle because if [] there's something wrong
-				ColN [] -> (fst c, N Nothing)
-				ColS [] -> (fst c, N Nothing)
-				ColN (h:ts) -> (fst c, N h)
-				ColS (h:ts) -> (fst c, S h)
-		
+popCell (s, ColN []) = (s, N Nothing)
+popCell (s, ColS []) = (s, N Nothing)
+popCell (s, ColN (h:ts)) = (s, N h)
+popCell (s, ColS (h:ts)) = (s, S h)
+        
+        
 -- Add a Record to a Tdb (transposed Db)
 pushRow::Row->Tdb->Tdb
 pushRow = zipWith pushCell
@@ -124,11 +105,9 @@ popRow tdb = map popCell tdb
 		
 -- Turn a field into a column
 cell2col::Cell->Col
-cell2col f = (fst f, lv)
-				where lv = case snd f of
-						N n -> ColN [n]
-						S s -> ColS [s]
-					
+cell2col (s, N n) = (s, ColN [n])
+cell2col (s, S n) = (s, ColS [n])
+                    
 -- Turn a record into a Tdb						
 row2tdb::Row->Tdb
 row2tdb = map cell2col						
@@ -150,9 +129,8 @@ fromTdb tdb = fromTdb' tdb []
 								_     -> fromTdb' (tailTdb tdb) ((popRow tdb):db)
 
 isdouble::Col->Bool
-isdouble c = case (snd c) of
-				ColN n -> True
-				ColS s -> False
+isdouble (_, ColN n) = True
+isdouble (_, ColS n) = False
 				
 
 -- The headers are the first row, turned into strings, if not already
@@ -163,6 +141,13 @@ fromCsv (h:rs) =  map (\r-> zipWith (\hf rf ->
 												S shf->(shf, rf)
 												N dhf->(show dhf, rf)
 									) h r) rs
+
+fromCsv2::Csv->Db
+fromCsv2 [] =  []
+fromCsv2 (h:rs) =  map (\r-> zipWith tov h r) rs
+                  where
+                    tov (S shf) rf = (shf, rf)
+                    tov (N dhf) rf = (show dhf, rf)
 
 -- A list of CellName, Value pairs - ie. the WHERE bit of an SQL statement
 type Query = [Filter]
@@ -216,12 +201,10 @@ sortdb s db = sortBy (\a b -> compare (select s b) (select s a)) db
 
 -- folds a function over a LValue only if it is a Maybe Double list
 mfoldl::(Double->Double->Double)->Double->ColValue->Double
-mfoldl f acc xs = 	foldl (\a x -> case x of
+mfoldl f acc (ColN ns) = 	foldl (\a x -> case x of
 						Just n -> f a n
 						Nothing -> a
-				    ) acc ld
-				where ld = case xs of
-					ColN ln -> ln
-					ColS ls -> [] 
+				    ) acc ns
+mfoldl f acc (ColS ss) = acc
 
-					
+

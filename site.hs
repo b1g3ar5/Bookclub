@@ -87,6 +87,7 @@ main = do
             >>> applyTemplateCompiler "templates/default.html"
             >>> relativizeUrlsCompiler
 
+    -- Compile the chart pages for each reader
     match "pages/*Chart.html" $ do
         route   $ setExtension ".html"
         compile $ readPageCompiler
@@ -96,6 +97,7 @@ main = do
             >>> applyTemplateCompiler "templates/default.html"
             >>> relativizeUrlsCompiler
 
+    -- Compile the blog pages
     match "pages/*.md" $ do
         route   $ setExtension "html"
         compile $ readPageCompiler
@@ -105,6 +107,7 @@ main = do
             >>> applyTemplateCompiler "templates/default.html"
             >>> relativizeUrlsCompiler
 
+    -- Compile the xml files for the chart pages
     forM_ pickers chooserGroup
     
     where
@@ -150,9 +153,11 @@ bespokeCompiler::(String->Page String)->Compiler Resource (Page String)
 bespokeCompiler = (getResourceString >>^)
 
 scoreTableCompiler = bespokeCompiler (csv2ml show)
+-- Score tale sorted according to score by reader n
 nameCompiler n = bespokeCompiler (csv2ml (show.(sortdb (CellName n))))
 scoreChartCompiler = bespokeCompiler (csv2ml (writeChart . fromDb))	
 meannessChartCompiler = bespokeCompiler (csv2ml (writeMeannessChart . fromDb))	
+-- Score chart for only books for reader called n
 chooserChartCompiler n = bespokeCompiler (csv2ml ((writeChooserChart n) . fromDb))	
 allChooserChartCompiler = bespokeCompiler (csv2ml ((writeAllChooserChart) . fromDb))	
 

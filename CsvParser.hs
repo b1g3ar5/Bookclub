@@ -1,14 +1,7 @@
 
 module CsvParser
     (
-		Value (N, S),
-		csvFile,
-		line,
-		p_value,
-		p_string,
-		p_number,
-		p_empty,
-		parse
+		Value (N, S), csvFile, line, p_value, p_string, p_number, p_empty, parse
     ) where
 
 import Control.Applicative

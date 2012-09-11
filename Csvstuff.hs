@@ -2,24 +2,8 @@
 
 module Csvstuff
     (
-		csvFile,
-        pickerBox,
-        Box(..),
-        Stat(..),
-        dbBox,
-		dread,
-		msum,
-		msumsq,
-		mcount,
-		mmin,
-		mmax,
-		mmean,
-		mstd,
-		rownames,
-		colnames,
-		Col,
-		line,
-		isdouble
+		csvFile, pickerBox, Box(..), Stat(..), dbBox, dread, msum, msumsq, mcount, mmin,
+		mmax, mmean, mstd, rownames, colnames, Col, line, isdouble
     ) where
 	
 import Control.Applicative
@@ -58,7 +42,7 @@ rows = tail
 
 -- The data columns
 columns::Db->Db
-columns db = tail $ foldl add_on (map (\x->[x]) (head $ tail db)) (tail $ tail db)
+columns db = tail $ foldl add_on (map (\x->[x]) (head $ rows db)) (tail $ rows db)
 				where
 					add_on xss ys = zipWith (\xs y -> xs++[y]) xss ys
 		
