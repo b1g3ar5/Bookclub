@@ -1,0 +1,43 @@
+<chart>
+	<chart_type>stacked column</chart_type>
+	<axis_category orientation='diagonal_down' size='10'/>
+	<chart_rect x='40' y='80' width='600' height='350' />
+	<legend x='40' y='15' width='600' height='50' />
+	<draw><text shadow='shadow1' color='ffffee' alpha='75' rotation='0' size='50' x='40' y='15' width='600' height='50' h_align='left' v_align='top'>NEIL's Choices</text></draw><chart_data><row><null/>
+<string>STRINGS</string>
+<string>NEIL</string>
+<string>STRETCH</string>
+<string>IAIN</string>
+<string>JETHRO</string>
+</row>
+<row><string>max</string>
+<number>8.0</number>
+<number>10.0</number>
+<number>8.0</number>
+<number>9.0</number>
+<number>8.0</number>
+</row>
+<row><string>min</string>
+<number>3.0</number>
+<number>4.0</number>
+<number>2.2</number>
+<number>6.0</number>
+<number>3.0</number>
+</row>
+<row><string>open</string>
+<number>7.256497224813456</number>
+<number>8.803038448987353</number>
+<number>6.723292509229694</number>
+<number>8.513636139876638</number>
+<number>7.506438241627338</number>
+</row>
+<row><string>close</string>
+<number>4.043502775186543</number>
+<number>5.280294884345981</number>
+<number>3.5933741574369744</number>
+<number>6.629221002980503</number>
+<number>4.3935617583726625</number>
+</row>
+</chart_data><chart_type>candlestick</chart_type><series_color><color>333333</color></series_color>
+
+</chart>
