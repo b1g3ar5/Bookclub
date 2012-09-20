@@ -10,6 +10,8 @@ module Charts (
 	,getField
 ) where
 
+-- Added to change file 
+
 import Control.Arrow ((>>>))
 import Prelude hiding (id)
 import Control.Category (id)
