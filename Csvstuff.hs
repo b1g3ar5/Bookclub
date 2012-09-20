@@ -24,8 +24,6 @@ import System.FilePath (dropExtension, takeFileName)
 import CsvParser
 import CsvDatabase
 
--- added for test
-
 {-------------------------------------------
 Operations on a Db
 --------------------------------------------}
