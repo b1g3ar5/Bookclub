@@ -1,53 +1,56 @@
-Title,Author,STRINGS,NEIL,STRETCH,IAIN,JETHRO,Book Picker
-My Favourite Wife,Tony Parsons,6,4,3,n/a,n/a,STRINGS
-A Short History of Tractors in Ukrainian,Marina Lewycha,6,5,4,8,6,NEIL
-A Prayer for Owen Meany,John Irving,8,8,9,9,9,STRETCH
-Devil May Care,Sebastian Faulks,5,3,2,n/a,n/a,STRINGS
-The Plague,Albert Camus,3,6,3,n/a,n/a,NEIL
-London Fields,Martin Amis,7,6,10,n/a,n/a,STRETCH
-Winter in Madrid,CJ Sansom,7,9,5,8,7,STRINGS
-Disgrace,JM Cotzee,6,7,6,6,n/a,NEIL
-Surely You're Joking Mr Feynman,Richard Feynman,5,6,5,n/a,7,STRETCH
-Fox Hunting Man,Siegfried Sassoon,7,4,3,7,n/a,STRINGS
-To Kill a Mocking Bird,Haroer Lee,8,9,8,9,8,NEIL
-Coming Up for Air,George Orwell,8,7,6,7,6,IAIN
-Most Wanted Man,John LeCarre,5,6,6,5,4,STRETCH
-First Light,Geoffrey Wellum,7,7,4,9,8,JETHRO
-Bruno,Martin Walker,7,6,4,7,6,STRINGS
-Fingersmith,Sarah Waters,7,10,7,n/a,7,NEIL
-Switch Bitch/Kiss Kiss,Roald Dahl,8,7,6,n/a,6,STRETCH
-Billy Liar,Keith Waterhouse,5.5,4,5,n/a,6,IAIN
-One Flew Over the Cukoos Nest,Ken Kesey,4,5,4,4,3,JETHRO
-Point of Rescue,Sophie Hannah,5,4,3.5,4,7,STRINGS
-The Girl with the Dragon Tattoo,Steig Larsson,8,10,5.5,8,8,NEIL
-Bleak House,Charles Dickens,3,7,7.1,7.5,2,STRETCH
-Ordinary Thunderstorms,William Boyd,8,4,3,7,3,IAIN
-A Farewell To Arms,Ernest Hemmingway,5,4,5.5,7.5,7,JETHRO
-Cutting for Stone,Abraham Vergese,10,6,6.2,6,7.5,STRINGS
-Half a Yellow Sun,Chimamanda Adichie,6,7,6.5,7.5,5,NEIL
-It's Your Time You're Wasting,Frank Chalk,4,4,4.8,5,5,STRETCH
-Alone in Berlin,Hans Fallada,7,5,6.5,8.5,7,IAIN
-One Day,David Nicholls,7,5,5.2,5,7,JETHRO
-Love Songs from a Shallow Grave,Colin Cotterill,6.5,5,5,7.5,6.5,STRINGS
-Now You're One of Us,Asa Nonami,3,4,2.2,n/a,3,NEIL
-Town Like Alice,Neville Shute,6.7,5,5.3,5,7,IAIN
-Never Let Me Go,Kazuo Ishiguru,4,6.5,5,8,7,NEIL
-The Finkler Question,Howard Jacobson,6,4.5,4,4,2,IAIN
-The Big Sleep,Raymond Chandler,5.5,4.8,5.4,7.5,7.4,STRINGS
-In the Skin of a Lion,Michael Ondaatje,4.8,7,4.9,6.5,5.5,NEIL
-Do Androids Dream of Electric Sheep,Philip Dick,3,1.1,6,8,6.8,STRETCH
-Chasing the Sun,Richard Cohen,4.2,5,2,n/a,6,JETHRO
-House of the Hanged,Mark Mills,7,5.5,4.1,n/a,7,STRINGS
-Silks,Dick Francis,6,7,5.3,n/a,6,NEIL
-Empire Falls,Richard Russo,7.8,4,7.5,8.2,n/a,STRETCH
-Bounce,Matthew Syed,6.9,4,4.9,8,8,JETHRO
-The Unbearable Lightness of Being,Milan Kundera,2.9,5,4.7,7,4,IAIN
-When God Was a Rabbit,Sarah Winman,6,5.9,4,8,6.8,STRINGS
-The Fear Index,Robert Harris,6,6,4.5,n/a,4,NEIL
-Middlesex,Jeffrey Eugenides,5.9,5,7.1,6,6.6,STRETCH
-Sense of an Ending,Julian Barnes,5.9,4.5,7.5,8,6.8,JETHRO
-The Pilgrimage of Henry Fry,Rachel Joyce,6,6.5,5.4,7.5,6.8,IAIN
-Dark Winter,David Marks,7.0,5.0,4.0,n/a,6.5,STRINGS
-Gates of Fire,Steven Pressfield,7.0,7.5,5.3,n/a,n/a,NEIL
-Zen and the Art of Motorcycle Maintenance,Robert Persig,3,7,7.6,n/a,n/a,STRETCH
-Solar,Ian McEwan,5.8,4.0,5.7,n/a,6.0,JETHRO
+Title,Author,STRINGS,NEIL,STRETCH,IAIN,JETHRO,Book Picker,Date
+My Favourite Wife,Tony Parsons,6,4,3,n/a,n/a,STRINGS,Jun-08
+A Short History of Tractors in Ukrainian,Marina Lewycha,6,5,4,8,6,NEIL,Jul-08
+A Prayer for Owen Meany,John Irving,8,8,9,9,9,STRETCH,Aug-08
+Devil May Care,Sebastian Faulks,5,3,2,n/a,n/a,STRINGS,Sep-08
+The Plague,Albert Camus,3,6,3,n/a,n/a,NEIL,Oct-08
+London Fields,Martin Amis,7,6,10,n/a,n/a,STRETCH,Nov-08
+Winter in Madrid,CJ Sansom,7,9,5,8,7,STRINGS,Dec-08
+Disgrace,JM Cotzee,6,7,6,6,n/a,NEIL,Jan-09
+Surely You're Joking Mr Feynman,Richard Feynman,5,6,5,n/a,7,STRETCH,Feb-09
+Fox Hunting Man,Siegfried Sassoon,7,4,3,7,n/a,STRINGS,Mar-09
+To Kill a Mocking Bird,Haroer Lee,8,9,8,9,8,NEIL,Apr-09
+Coming Up for Air,George Orwell,8,7,6,7,6,IAIN,May-09
+Most Wanted Man,John LeCarre,5,6,6,5,4,STRETCH,Jun-09
+First Light,Geoffrey Wellum,7,7,4,9,8,JETHRO,Jul-09
+Bruno,Martin Walker,7,6,4,7,6,STRINGS,Aug-09
+Fingersmith,Sarah Waters,7,10,7,n/a,7,NEIL,Sep-09
+Switch Bitch/Kiss Kiss,Roald Dahl,8,7,6,n/a,6,STRETCH,Oct-09
+Billy Liar,Keith Waterhouse,5.5,4,5,n/a,6,IAIN,Nov-09
+One Flew Over the Cukoos Nest,Ken Kesey,4,5,4,4,3,JETHRO,Dec-09
+Point of Rescue,Sophie Hannah,5,4,3.5,4,7,STRINGS,Jan-10
+The Girl with the Dragon Tattoo,Steig Larsson,8,10,5.5,8,8,NEIL,Feb-10
+Bleak House,Charles Dickens,3,7,7.1,7.5,2,STRETCH,Mar-10
+Ordinary Thunderstorms,William Boyd,8,4,3,7,3,IAIN,Apr-10
+A Farewell To Arms,Ernest Hemmingway,5,4,5.5,7.5,7,JETHRO,May-10
+Cutting for Stone,Abraham Vergese,10,6,6.2,6,7.5,STRINGS,Jun-10
+Half a Yellow Sun,Chimamanda Adichie,6,7,6.5,7.5,5,NEIL,Jul-10
+It's Your Time You're Wasting,Frank Chalk,4,4,4.8,5,5,STRETCH,Aug-10
+Alone in Berlin,Hans Fallada,7,5,6.5,8.5,7,IAIN,Sep-10
+One Day,David Nicholls,7,5,5.2,5,7,JETHRO,Oct-10
+Love Songs from a Shallow Grave,Colin Cotterill,6.5,5,5,7.5,6.5,STRINGS,Nov-10
+Now You're One of Us,Asa Nonami,3,4,2.2,n/a,3,NEIL,Dec-10
+Town Like Alice,Neville Shute,6.7,5,5.3,5,7,IAIN,Jan-11
+Never Let Me Go,Kazuo Ishiguru,4,6.5,5,8,7,NEIL,Feb-11
+The Finkler Question,Howard Jacobson,6,4.5,4,4,2,IAIN,Mar-11
+The Big Sleep,Raymond Chandler,5.5,4.8,5.4,7.5,7.4,STRINGS,Apr-11
+In the Skin of a Lion,Michael Ondaatje,4.8,7,4.9,6.5,5.5,NEIL,May-11
+Do Androids Dream of Electric Sheep,Philip Dick,3,1.1,6,8,6.8,STRETCH,Jun-11
+Chasing the Sun,Richard Cohen,4.2,5,2,n/a,6,JETHRO,Jul-11
+House of the Hanged,Mark Mills,7,5.5,4.1,n/a,7,STRINGS,Aug-11
+Silks,Dick Francis,6,7,5.3,n/a,6,NEIL,Sep-11
+Empire Falls,Richard Russo,7.8,4,7.5,8.2,n/a,STRETCH,Oct-11
+Bounce,Matthew Syed,6.9,4,4.9,8,8,JETHRO,Nov-11
+The Unbearable Lightness of Being,Milan Kundera,2.9,5,4.7,7,4,IAIN,Dec-11
+When God Was a Rabbit,Sarah Winman,6,5.9,4,8,6.8,STRINGS,Jan-12
+The Fear Index,Robert Harris,6,6,4.5,n/a,4,NEIL,Feb-12
+Middlesex,Jeffrey Eugenides,5.9,5,7.1,6,6.6,STRETCH,Mar-12
+Sense of an Ending,Julian Barnes,5.9,4.5,7.5,8,6.8,JETHRO,Apr-12
+The Pilgrimage of Henry Fry,Rachel Joyce,6,6.5,5.4,7.5,6.8,IAIN,May-12
+Dark Winter,David Marks,7,5,4,n/a,6.5,STRINGS,Jun-12
+Gates of Fire,Steven Pressfield,7,7.5,5.3,n/a,n/a,NEIL,Jul-12
+Zen and the Art of Motorcycle Maintenance,Robert Persig,3,7,7.6,n/a,4,STRETCH,Aug-12
+Solar,Ian McEwan,5.8,4,5.7,n/a,6,JETHRO,Sep-12
+Watching the Dark,Peter Robinson,6.2,3.5,3,n/a,3.5,STRINGS,Oct-12
+Enigma,Robert Harris,5.9,7.8,5.5,n/a,6.5,NEIL,Nov-12
+Book Thief,Marcus Zusak,n/a,n/a,n/a,n/a,n/a,STRETCH,Dec-12

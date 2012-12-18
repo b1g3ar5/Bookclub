@@ -25,18 +25,18 @@
 <number>3.0</number>
 </row>
 <row><string>open</string>
-<number>6.9383638763892534</number>
-<number>5.870778997019493</number>
-<number>6.288529565110709</number>
+<number>6.87037111889553</number>
+<number>5.745824032691755</number>
+<number>6.344155279748395</number>
 <number>8.705909212798657</number>
-<number>8.12747709986995</number>
+<number>7.968109172163913</number>
 </row>
 <row><string>close</string>
-<number>4.490207552182175</number>
-<number>3.986363860123365</number>
-<number>3.1686132920321484</number>
+<number>4.579628881104469</number>
+<number>3.879175967308245</number>
+<number>3.3558447202516044</number>
 <number>5.127424120534677</number>
-<number>4.958237185844336</number>
+<number>4.981890827836087</number>
 </row>
 </chart_data><chart_type>candlestick</chart_type><series_color><color>333333</color></series_color>
 

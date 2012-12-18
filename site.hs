@@ -20,6 +20,8 @@ import Charts as C
 
 import System.IO
 
+import Network.FTP.Client
+
 main :: IO ()
 main = do
     -- We need the pickers so that we can make some compilers
@@ -73,12 +75,22 @@ main = do
     -- Compile the templates for use later
     match "templates/*" $ compile templateCompiler
 
+    -- Copy all the files required for the charts - including sub directories
+    match "pages/sitemap.xml" $ do
+        route   idRoute
+        compile copyFileCompiler
+
+    -- Copy all the files required for the charts - including sub directories
+    match "pages/robots.txt" $ do
+        route   idRoute
+        compile copyFileCompiler
+
     -- Copy all the pages
 	-- Note readPageCompiler so Pandoc not called
 	-- Also the csvs are all included (but there is only one becasue there is one file
 	-- in the csv directory above
     match (predicate (\i -> (matches "pages/*" i) && (not (matches "pages/*Chart.html" i)) && (not (matches "pages/*.md" i)))) $ do
-        route   $ setExtension ".html"
+        route $ setExtension ".html"
         compile $ readPageCompiler
 			>>> requireAll scoreTable (foldr includeFile) 
 			>>> requireList incs -- This includes all the hitParade include files
@@ -87,7 +99,7 @@ main = do
             >>> applyTemplateCompiler "templates/default.html"
             >>> relativizeUrlsCompiler
 
-    -- Compile the chart pages for each reader
+        -- Compile the chart pages for each reader
     match "pages/*Chart.html" $ do
         route   $ setExtension ".html"
         compile $ readPageCompiler

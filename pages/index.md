@@ -33,8 +33,8 @@ Now some code:
 
 Did that look OK?
 
-To do
-=====
+Lincoln Student Accommodation
+============================
 
-Add index of markdown blog pages, write some blog pages.
+We own [Brayford Lets](http://www.brayfordlets.co.uk) which provides student accommodation for students at Lincoln University
 
