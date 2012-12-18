@@ -23,9 +23,10 @@ import Numeric (readSigned, readFloat)
 import System.FilePath (dropExtension, takeFileName) 
 
 import Hakyll
-import CsvParser as CP
-import Csvstuff as CS
-import CsvDatabase as CD
+import CsvParser --as CP
+import Csvstuff --as CS
+import CsvDatabase --as CD
+import CsvStats
 
 import System.IO
 
@@ -62,7 +63,7 @@ writeChooserChart p tdb = do
 	let f = (CellName "Book Picker", vf)
 	let q = [f]
 	let db = fromTdb tdb
-	let fdb = CD.exec q db
+	let fdb = exec q db
 	let ftdb = fromDb fdb
 	let ncols = filter isdouble ftdb
 	let nys =  map (\c-> snd c) ncols

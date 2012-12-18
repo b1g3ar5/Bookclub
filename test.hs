@@ -14,6 +14,7 @@ import Hakyll
 import CsvParser as CP
 import Csvstuff as CS
 import CsvDatabase as CD
+import CsvStats
 
 import System.IO
 

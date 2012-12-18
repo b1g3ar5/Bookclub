@@ -25,7 +25,11 @@ import Network.FTP.Client
 main :: IO ()
 main = do
     -- We need the pickers so that we can make some compilers
-    pickers <- ioPickers
+    ss <- readFile "./csv/scoreTable.csv"
+    let db = csv2db ss
+    let tdb = fromDb db
+    let ncols = (filter isdouble) tdb
+    let pickers = (map fst) ncols
 
     hakyll $ do
 
