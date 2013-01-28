@@ -1,75 +1,43 @@
-/*
-	The CSS, XHTML and design is released under GPL:
-	http://www.opensource.org/licenses/gpl-license.php
-*/
-
-body {
-	font-family:'Lucida Grande', Verdana, Arial, Sans-Serif;
+ body{font-family:'Lucida Grande', Verdana, Arial, Sans-Serif}
+ #header{border-bottom:1px solid #aaa}
+ a{background:transparent;color:black;text-decoration:none}
+ .search{display:none}
+ #hmenu, #nav{display:none}
+ #headertitle{display:none}
+ #sidebar{display:none}
+ #footer{display:none}
+ .post blockquote{padding:0 0 0 1em;border-left:0.4em solid #ccc;font-size:small}
+ .postmetadata, .post-meta{clear:both;font-size:small}.navigation{display:none}
+ .commentlist img.avatar{float:right;margin:0 0 0 10px;padding:3px;border:1px solid #eee}
+ .aligncenter, div.aligncenter{display:block;margin-left:auto;margin-right:auto}
+ .alignleft{float:left;margin:5px 5px 5px 0}
+ .alignright{float:right;margin:5px 0 5px 5px}
+ 
+ .postentry table {
+	border-width:0 0px 0px 0;
+	border-style:solid;
+	border-color:#ccc;
+	font-size:0.6em;
 }
 
-#header {
-	border-bottom: 1px solid #aaa;
+
+.postentry table tr td {
+	padding:2px 5px;
+	border-width:0px 0 0 0px;
+	border-style:solid;
+	border-color:#ccc;
+
 }
 
-a {
-	background:transparent;
-	color:black;
-	text-decoration:none;
+.postentry table tr th {
+	border-width:0px 0 0 0px;
+	border-style:solid;
+	border-color:#ccc;
+	padding:2px 5px;
+	background:#f4f4f4;
+	color:#666;
+	font-weight:bold;
+	text-transform:uppercase;
+	text-align:center;
 }
 
-.search {
-	display:none;
-}
-
-#hmenu, #nav {
-	display:none;
-}
-
-#sidebar {
-	display:none;
-}
-
-#footer {
-	display:none;
-}
-
-.post blockquote {
-	padding:0 0 0 1em;
-	border-left:0.4em solid #ccc;
-	font-size:small;
-}
-
-.postmetadata, .post-meta {
-	clear:both;
-	font-size:small;
-}
-
-.navigation {
-	display:none;
-}
-
-#respond,
-#commentform, #comments .reply {
-	display:none;
-}
-
-.commentlist img.avatar {
-	float: right; margin: 0 0 0 10px; padding: 3px; border:1px solid #eee;
-}
-
-.aligncenter,
-div.aligncenter {
-   display: block;
-   margin-left: auto;
-   margin-right: auto;
-}
-
-.alignleft {
-   float: left;
-   margin: 5px 5px 5px 0;
-}
-
-.alignright {
-   float: right;
-   margin: 5px 0 5px 5px;
-}

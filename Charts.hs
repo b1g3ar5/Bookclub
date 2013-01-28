@@ -7,7 +7,6 @@ module Charts (
 	,writeChooserChart
 	,writeChartXs
 	,writeChartY
-	,getField
 ) where
 
 import Control.Arrow ((>>>))
