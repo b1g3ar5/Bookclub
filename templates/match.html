@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?php include "../pages/funcs.php"; ?>
+
+
+This is the template for matches
+
+The title of the page is $title$.
+
+The venue for the match is at $Venue$.
+
+The postcode for your satnav is $Postcode$
+
+The url of this page is $url$
+
+The player availability is as follows:
+
+<?php echo 'Hello ' . getVar("name") . '!\n'; ?>
+<?php echo 'Your password is ' . (int)getVar("password") . '!'; ?>
+   
+<?php echo setAvailable($title$, 1) ; ?>
+<?php echo setAvailable($title$, 0) ; ?>
+
+
+<?php echo 'PlayerID = ' . getPlayerId('Rob Seeley') . ' '; ?>
+<?php echo 'MatchID = ' . getMatchId('$title$') . ' '; ?>
+
+<table border="1">
+<tr>
+<th>Player</th>
+<th>Availability</th>
+<th>Edit</th>
+</tr>
+<tr>
+<td>$Player1$</td>
+<td>$Available1$</td>
+<td><?php echo getEdit($title$, 1231); ?>
+</td>
+</tr>
+<tr>
+<td>$Player2$</td>
+<td>$Available2$</td>
+<td><?php echo getEdit($title$, 1232); ?></td>
+</tr>
+<tr>
+<td>$Player3$</td>
+<td>$Available3$</td>
+<td><?php echo getEdit($title$, 1233); ?></td>
+</tr>
+<tr>
+<td>$Player4$</td>
+<td>$Available4$</td>
+<td><?php echo getEdit($title$, 1234); ?></td>
+</tr>
+<tr>
+<td>$Player5$</td>
+<td>$Available5$</td>
+<td><?php echo getEdit($title$, 1235); ?></td>
+</tr>
+<tr>
+<td>$Player6$</td>
+<td>$Available6$</td>
+<td><?php echo getEdit($title$, 1236); ?></td>
+</tr>
+<tr>
+<td>$Player7$</td>
+<td>$Available7$</td>
+<td><?php echo getEdit($title$, 1237); ?></td>
+</tr>
+<tr>
+<td>$Player8$</td>
+<td>$Available8$</td>
+<td><?php echo getEdit($title$, 1238); ?></td>
+</tr>
+<tr>
+<td>$Player9$</td>
+<td>$Available9$</td>
+<td><?php echo getEdit($title$, 1239); ?></td>
+</tr>
+<tr>
+<td>$Player10$</td>
+<td>$Available10$</td>
+<td><?php echo getEdit($title$, 1240); ?></td>
+</tr>
+<tr>
+<td>$Player11$</td>
+<td>$Available11$</td>
+<td><?php echo getEdit($title$, 1241); ?></td>
+</tr>
+<tr>
+<td>$Player12$</td>
+<td>$Available12$</td>
+<td><?php echo getEdit($title$, 1242); ?></td>
+</tr>
+<tr>
+<td>$Player13$</td>
+<td>$Available13$</td>
+<td><?php echo getEdit($title$, 1243); ?></td>
+</tr>
+<tr>
+<td>$Player14$</td>
+<td>$Available14$</td>
+<td><?php echo getEdit($title$, 1244); ?></td>
+</tr>
+<tr>
+<td>$Player15$</td>
+<td>$Available15$</td>
+<td><?php echo getEdit($title$, 1245); ?></td>
+</tr>
+<tr>
+<td>$Player16$</td>
+<td>$Available16$</td>
+<td><?php echo getEdit($title$, 1246); ?></td>
+</tr>
+</table>
+
+$body$

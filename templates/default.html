@@ -12,15 +12,44 @@
               title="SimpleBlog"
               href="/rss.xml" />
 
-		<script language="javascript">
-			AC_FL_RunContent = 0;
-		</script> 
-		<script language="javascript"> 
-			DetectFlashVer = 0;
-		</script> 
-		<script src="../charts/AC_RunActiveContent.js" language="javascript">
-		</script> 
+		<script language="javascript">AC_FL_RunContent = 0;</script> 
+		<script language="javascript">DetectFlashVer = 0;</script> 
+		<script src="../charts/AC_RunActiveContent.js" language="javascript"></script> 
+		<script src="../scripts/jquery.js" language="javascript"></script> 
 	
+        <script>
+            function getXML(str)
+            {
+                var ret;
+                var xmlhttp=new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function() {
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                        document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+                    }
+                }
+                xmlhttp.open("GET", "http://warm-forest-5729.herokuapp.com/graph/" + str, true);
+                xmlhttp.send();
+                return document.getElementById("txtHint").innerHTML;
+            }
+            
+            function httpGet(str)
+            {
+                xmlhttp=new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function()
+                {
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                    {
+                        document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+                        return xmlhttp.responseText;
+                    }
+                }
+                xmlhttp.open("GET", "http://warm-forest-5729.herokuapp.com/graph/" + str, true );
+                xmlhttp.send();    
+            }            
+        </script>
+
+        <!-- With this code <div id=”queryResultContainer”/> should be filled with the contents of UxternalURL // -->
+
 		<script language="JavaScript" type="text/javascript"> 
 			<!-- 
 				var requiredMajorVersion = 10;
